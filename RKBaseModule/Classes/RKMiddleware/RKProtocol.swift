@@ -19,8 +19,10 @@ import Foundation
 @objc public protocol RKContactProtocol : NSObjectProtocol {
     
     /// 获取联系人列表
-    @objc func getContactList() -> [UserInfo]
+    @objc func getContactList() -> [[String : Any]]
 
     /// 获取联系人详情
-    @objc func getContact(byId: String) -> UserInfo?
+    @objc func getContact(byId: String) -> [String : Any]?
+    
+    
 }
