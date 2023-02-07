@@ -1,5 +1,4 @@
 import XCTest
-import RKBaseModule
 
 class Tests: XCTestCase {
     

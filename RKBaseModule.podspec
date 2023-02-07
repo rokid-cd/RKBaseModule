@@ -28,15 +28,32 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/刘爽/RKBaseModule.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '10.0'
-
-  s.source_files = 'RKBaseModule/Classes/**/*'
+  s.static_framework = true
   
-  # s.resource_bundles = {
-  #   'RKBaseModule' => ['RKBaseModule/Assets/*.png']
-  # }
+  s.swift_version = '5.0'
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.ios.deployment_target = '11.0'
+  
+  s.default_subspec = 'RKExtention'
+  
+  s.resources = 'RKBaseModule/Assets/RKBaseModule.bundle'
+    
+  s.subspec 'RKFilePreview' do |ss|
+    ss.source_files = 'RKBaseModule/Classes/RKFilePreview/**/*'
+    ss.dependency 'RKBaseModule/RKExtention'
+    ss.dependency 'RKBaseModule/RKHUD'
+    
+    ss.dependency 'KSYMediaPlayer_iOS/KSYMediaPlayer_vod', '~> 3.0.3'
+    ss.dependency 'SnapKit', '~> 4.2.0'
+    ss.dependency 'Kingfisher'
+  end
+  
+  s.subspec 'RKHUD' do |ss|
+    ss.source_files = 'RKBaseModule/Classes/RKHUD/**/*'
+  end
+  
+  s.subspec 'RKExtention' do |ss|
+    ss.source_files = 'RKBaseModule/Classes/RKExtention/**/*'
+  end
+  
 end
