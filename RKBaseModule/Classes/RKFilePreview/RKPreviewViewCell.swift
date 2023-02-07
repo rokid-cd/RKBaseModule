@@ -341,14 +341,14 @@ extension RKPreviewVideoCell {
     @objc private func downloadAction() {
         
         guard let model = videoModel else { return }
-        RKMiddleware.share.promptDelegate?.showLoading(inView: self)
+        RKMiddleware.share.promptDelegate?.showLoading(inView: self) ?? RKHUD.show()
         RKDownloadManager.downLoadFile(fileUrlPath: model.fileUrl) { progress in
             
         } completion: {[weak self] error, path in
-            RKMiddleware.share.promptDelegate?.hidenLoading(inView: self)
+            RKMiddleware.share.promptDelegate?.hidenLoading(inView: self) ?? RKHUD.remove()
             guard let self = self else { return }
             if let _ = error {
-                RKMiddleware.share.promptDelegate?.showToast(withText: "下载失败", inView: self)
+                RKMiddleware.share.promptDelegate?.showToast(withText: "下载失败", inView: self) ?? RKHUD.showToast(status: "下载失败")
             } else {
                 self.saveLoacalVideo(URL(fileURLWithPath: path))
             }
@@ -361,14 +361,13 @@ extension RKPreviewVideoCell {
             PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: fileUrl)
         } completionHandler: { success, error in
             if (success) {
-                RKMiddleware.share.promptDelegate?.showToast(withText: "保存成功", inView: self)
+                RKMiddleware.share.promptDelegate?.showToast(withText: "保存成功", inView: self) ?? RKHUD.showToast(status: "保存成功")
             } else {
-                RKMiddleware.share.promptDelegate?.showToast(withText: "保存失败", inView: self)
+                RKMiddleware.share.promptDelegate?.showToast(withText: "保存失败", inView: self) ?? RKHUD.showToast(status: "保存失败")
             }
         }
     }
 }
-
 
 
 /// 加载进度环
@@ -537,19 +536,19 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
     //保存到相册
     @objc func downloadAction() {
         guard let image = imageView.image else {
-            RKMiddleware.share.promptDelegate?.showToast(withText: "保存失败", inView: self)
+            RKMiddleware.share.promptDelegate?.showToast(withText: "保存失败", inView: self) ?? RKHUD.showToast(status: "保存失败")
             return
         }
-        RKMiddleware.share.promptDelegate?.showLoading(inView: self)
+        RKMiddleware.share.promptDelegate?.showLoading(inView: self) ?? RKHUD.show()
         UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
     }
     
     @objc func savedPhotosAlbum(image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: AnyObject) {
-        RKMiddleware.share.promptDelegate?.hidenLoading(inView: self)
+        RKMiddleware.share.promptDelegate?.hidenLoading(inView: self) ?? RKHUD.remove()
         if error != nil {
-            RKMiddleware.share.promptDelegate?.showToast(withText: "保存失败", inView: self)
+            RKMiddleware.share.promptDelegate?.showToast(withText: "保存失败", inView: self) ?? RKHUD.showToast(status: "保存失败")
         }else{
-            RKMiddleware.share.promptDelegate?.showToast(withText: "保存成功", inView: self)
+            RKMiddleware.share.promptDelegate?.showToast(withText: "保存成功", inView: self) ?? RKHUD.showToast(status: "保存成功")
         }
     }
 }

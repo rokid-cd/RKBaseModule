@@ -12,7 +12,5 @@ public class RKMiddleware {
     public static let share = RKMiddleware()
     
     public var promptDelegate: RKPromptProtocol?
-    
-    public var contactDelegate: RKContactProtocol?
 }
 

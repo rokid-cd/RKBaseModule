@@ -40,6 +40,7 @@ TODO: Add long description of the pod here.
     
   s.subspec 'RKFilePreview' do |ss|
     ss.source_files = 'RKBaseModule/Classes/RKFilePreview/**/*'
+    ss.dependency 'RKBaseModule/RKHUD'
     ss.dependency 'RKBaseModule/RKExtention'
     ss.dependency 'RKBaseModule/RKMiddleware'
     
