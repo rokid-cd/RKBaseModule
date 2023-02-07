@@ -118,7 +118,7 @@ class RKDocumentPreviewVC: UIViewController {
             default:
                 imgName = rawValue
             }
-            return UIImage(named: "rk_file_\(imgName)")
+            return Bundle.rkImage(named: "rk_file_\(imgName)")
         }
     }
     

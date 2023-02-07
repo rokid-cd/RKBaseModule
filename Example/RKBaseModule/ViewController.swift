@@ -32,8 +32,8 @@ class ViewController: UIViewController {
                 RKHUD.dismiss()
             }
         } else if tag == 2 {
-//            RKFilePreview.previewDocFile(filePath: "https://ar.rokidcdn.com/saas/im/72fe13541fa1452bbd90e4135531a092/44C95C0B5EB14E748B7DC1DEE897EEF8-%E4%BD%9C%E4%B8%9A%E4%BB%BB%E5%8A%A1%E6%8A%A5%E5%91%8A_%E5%9C%A8%E7%BA%BF%E7%BA%A2%E5%A4%96%E6%B5%8B%E6%B8%A9.pdf")
-            RKFilePreview.previewDocFile(filePath: "https://58.244.22.157:8187/saas-industry/saas/im/72fe13541fa1452bbd90e4135531a092/CAE5E5D7175B4BFCB18589B7C625C941-3000215267.mp4")
+            RKFilePreview.previewDocFile(filePath: "https://ar.rokidcdn.com/saas/im/72fe13541fa1452bbd90e4135531a092/44C95C0B5EB14E748B7DC1DEE897EEF8-%E4%BD%9C%E4%B8%9A%E4%BB%BB%E5%8A%A1%E6%8A%A5%E5%91%8A_%E5%9C%A8%E7%BA%BF%E7%BA%A2%E5%A4%96%E6%B5%8B%E6%B8%A9.pdf")
+//            RKFilePreview.previewDocFile(filePath: "https://58.244.22.157:8187/saas-industry/saas/im/72fe13541fa1452bbd90e4135531a092/CAE5E5D7175B4BFCB18589B7C625C941-3000215267.mp4")
             
         } else if tag == 3 {
             let model1 = RKFileModel()

@@ -44,7 +44,7 @@ TODO: Add long description of the pod here.
     ss.dependency 'RKBaseModule/RKMiddleware'
     
     ss.dependency 'KSYMediaPlayer_iOS/KSYMediaPlayer_vod', '~> 3.0.3'
-    ss.dependency 'SnapKit', '~> 4.2.0'
+    ss.dependency 'SnapKit'
     ss.dependency 'Kingfisher'
   end
   
