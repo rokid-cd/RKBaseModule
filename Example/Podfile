@@ -4,8 +4,7 @@ platform :ios, '11.0'
 
 target 'RKBaseModule_Example' do
   
-  pod 'RKBaseModule', :path => '../'
-  pod 'RKBaseModule/RKHUD', :path => '../'
+  pod 'RKBaseModule/RKFilePreview', :path => '../'
   
   target 'RKBaseModule_Tests' do
     inherit! :search_paths

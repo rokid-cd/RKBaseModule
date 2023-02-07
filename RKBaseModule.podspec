@@ -34,15 +34,14 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '11.0'
   
-  s.default_subspec = 'RKFilePreview'
-  
-  s.resources = 'RKBaseModule/Assets/RKBaseModule.bundle'
-    
+  s.default_subspec = 'RKPrompt'
+      
   s.subspec 'RKFilePreview' do |ss|
+    ss.resources    = 'RKBaseModule/Assets/RKBaseModule.bundle'
     ss.source_files = 'RKBaseModule/Classes/RKFilePreview/**/*'
-    ss.dependency 'RKBaseModule/RKHUD'
+    
+    ss.dependency 'RKBaseModule/RKPrompt'
     ss.dependency 'RKBaseModule/RKExtention'
-    ss.dependency 'RKBaseModule/RKMiddleware'
     
     ss.dependency 'KSYMediaPlayer_iOS/KSYMediaPlayer_vod', '~> 3.0.3'
     ss.dependency 'SnapKit'
@@ -50,6 +49,7 @@ TODO: Add long description of the pod here.
   end
   
   s.subspec 'RKHUD' do |ss|
+    ss.resources    = 'RKBaseModule/Assets/RKBaseModule.bundle'
     ss.source_files = 'RKBaseModule/Classes/RKHUD/**/*'
   end
   
@@ -57,8 +57,9 @@ TODO: Add long description of the pod here.
     ss.source_files = 'RKBaseModule/Classes/RKExtention/**/*'
   end
   
-  s.subspec 'RKMiddleware' do |ss|
-    ss.source_files = 'RKBaseModule/Classes/RKMiddleware/**/*'
+  s.subspec 'RKPrompt' do |ss|
+    ss.dependency 'RKBaseModule/RKHUD'
+    ss.source_files = 'RKBaseModule/Classes/RKPrompt/**/*'
   end
   
   s.subspec 'RKReplayKit' do |ss|

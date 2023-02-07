@@ -14,6 +14,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+//        RKPrompt.share.promptDelegate = self
     }
 
     override func didReceiveMemoryWarning() {
@@ -76,3 +78,16 @@ class ViewController: UIViewController {
     }
 }
 
+extension ViewController: RKPromptProtocol {
+    func showToast(withText: String, inView: UIView?) {
+        print("toast提示")
+    }
+    
+    func showLoading(inView: UIView?) {
+        print("showLoading")
+    }
+    
+    func hidenLoading(inView: UIView?) {
+        print("hidenLoading")
+    }
+}

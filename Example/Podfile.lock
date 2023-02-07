@@ -1,22 +1,20 @@
 PODS:
   - Kingfisher (6.3.1)
   - KSYMediaPlayer_iOS/KSYMediaPlayer_vod (3.0.3)
-  - RKBaseModule (0.1.0):
-    - RKBaseModule/RKFilePreview (= 0.1.0)
   - RKBaseModule/RKExtention (0.1.0)
   - RKBaseModule/RKFilePreview (0.1.0):
     - Kingfisher
     - KSYMediaPlayer_iOS/KSYMediaPlayer_vod (~> 3.0.3)
     - RKBaseModule/RKExtention
-    - RKBaseModule/RKMiddleware
-    - SnapKit (~> 4.2.0)
+    - RKBaseModule/RKPrompt
+    - SnapKit
   - RKBaseModule/RKHUD (0.1.0)
-  - RKBaseModule/RKMiddleware (0.1.0)
-  - SnapKit (4.2.0)
+  - RKBaseModule/RKPrompt (0.1.0):
+    - RKBaseModule/RKHUD
+  - SnapKit (5.6.0)
 
 DEPENDENCIES:
-  - RKBaseModule (from `../`)
-  - RKBaseModule/RKHUD (from `../`)
+  - RKBaseModule/RKFilePreview (from `../`)
 
 SPEC REPOS:
   trunk:
@@ -31,9 +29,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Kingfisher: 016c8b653a35add51dd34a3aba36b580041acc74
   KSYMediaPlayer_iOS: bd163c277487e99df58941f10f090af2fb53fd6d
-  RKBaseModule: fcaa005b70a3f302c0da4442a02ef1dc33d805f3
-  SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
+  RKBaseModule: d97850913e17b794618faafa7415e23a52ef38ef
+  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
 
-PODFILE CHECKSUM: 4bdb8cab5457cd3e9a3a51f089d69ada84245b74
+PODFILE CHECKSUM: 26514a204a2b824125a524f81e49d09d52ffe2f1
 
 COCOAPODS: 1.11.3
