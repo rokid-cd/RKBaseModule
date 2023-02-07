@@ -1,11 +1,11 @@
 use_frameworks!
-#use_modular_headers!
 
 platform :ios, '11.0'
 
 target 'RKBaseModule_Example' do
   
   pod 'RKBaseModule', :path => '../'
+  pod 'RKBaseModule/RKHUD', :path => '../'
   
   target 'RKBaseModule_Tests' do
     inherit! :search_paths

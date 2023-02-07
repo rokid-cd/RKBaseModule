@@ -34,14 +34,14 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '11.0'
   
-  s.default_subspec = 'RKExtention'
+  s.default_subspec = 'RKFilePreview'
   
   s.resources = 'RKBaseModule/Assets/RKBaseModule.bundle'
     
   s.subspec 'RKFilePreview' do |ss|
     ss.source_files = 'RKBaseModule/Classes/RKFilePreview/**/*'
     ss.dependency 'RKBaseModule/RKExtention'
-    ss.dependency 'RKBaseModule/RKHUD'
+    ss.dependency 'RKBaseModule/RKMiddleware'
     
     ss.dependency 'KSYMediaPlayer_iOS/KSYMediaPlayer_vod', '~> 3.0.3'
     ss.dependency 'SnapKit', '~> 4.2.0'
@@ -54,6 +54,10 @@ TODO: Add long description of the pod here.
   
   s.subspec 'RKExtention' do |ss|
     ss.source_files = 'RKBaseModule/Classes/RKExtention/**/*'
+  end
+  
+  s.subspec 'RKMiddleware' do |ss|
+    ss.source_files = 'RKBaseModule/Classes/RKMiddleware/**/*'
   end
   
   s.subspec 'RKReplayKit' do |ss|

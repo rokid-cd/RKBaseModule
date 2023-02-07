@@ -341,13 +341,14 @@ extension RKPreviewVideoCell {
     @objc private func downloadAction() {
         
         guard let model = videoModel else { return }
-        RKHUD.show()
+        RKMiddleware.share.promptDelegate?.showLoading(inView: self)
         RKDownloadManager.downLoadFile(fileUrlPath: model.fileUrl) { progress in
             
         } completion: {[weak self] error, path in
+            RKMiddleware.share.promptDelegate?.hidenLoading(inView: self)
             guard let self = self else { return }
             if let _ = error {
-                RKHUD.showToast(status: "下载失败")
+                RKMiddleware.share.promptDelegate?.showToast(withText: "下载失败", inView: self)
             } else {
                 self.saveLoacalVideo(URL(fileURLWithPath: path))
             }
@@ -360,9 +361,9 @@ extension RKPreviewVideoCell {
             PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: fileUrl)
         } completionHandler: { success, error in
             if (success) {
-                RKHUD.showToast(status: "保存成功")
+                RKMiddleware.share.promptDelegate?.showToast(withText: "保存成功", inView: self)
             } else {
-                RKHUD.showToast(status: "保存失败")
+                RKMiddleware.share.promptDelegate?.showToast(withText: "保存失败", inView: self)
             }
         }
     }
@@ -536,18 +537,19 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
     //保存到相册
     @objc func downloadAction() {
         guard let image = imageView.image else {
-            RKHUD.showToast(status: "保存失败")
+            RKMiddleware.share.promptDelegate?.showToast(withText: "保存失败", inView: self)
             return
         }
-        RKHUD.show()
+        RKMiddleware.share.promptDelegate?.showLoading(inView: self)
         UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
     }
     
     @objc func savedPhotosAlbum(image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: AnyObject) {
+        RKMiddleware.share.promptDelegate?.hidenLoading(inView: self)
         if error != nil {
-            RKHUD.showToast(status: "保存失败")
+            RKMiddleware.share.promptDelegate?.showToast(withText: "保存失败", inView: self)
         }else{
-            RKHUD.showToast(status: "保存成功")
+            RKMiddleware.share.promptDelegate?.showToast(withText: "保存成功", inView: self)
         }
     }
 }
