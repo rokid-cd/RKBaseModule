@@ -56,4 +56,8 @@ TODO: Add long description of the pod here.
     ss.source_files = 'RKBaseModule/Classes/RKExtention/**/*'
   end
   
+  s.subspec 'RKReplayKit' do |ss|
+    ss.vendored_frameworks = 'RKBaseModule/Classes/RKReplayKit/RokidReplayKit.framework'
+  end
+  
 end

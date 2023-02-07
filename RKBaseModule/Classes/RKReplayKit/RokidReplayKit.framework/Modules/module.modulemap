@@ -1,0 +1,6 @@
+framework module RokidReplayKit {
+  umbrella header "RokidReplayKit.h"
+
+  export *
+  module * { export * }
+}
