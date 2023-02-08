@@ -13,7 +13,7 @@ typedef void(^ThumbnailClosure)( UIImage * _Nullable image);
 
 @interface RKThumbnailImage : NSObject
 
-+ (void)thumbnailImage:(NSString *)filePath complete:(ThumbnailClosure)closure;
++ (void)thumbnailImage:(NSURL *)fileUrl complete:(ThumbnailClosure)closure;
 
 @end
 

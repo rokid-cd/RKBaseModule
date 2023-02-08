@@ -16,8 +16,8 @@ import Kingfisher
 }
 
 @objc public class RKFileModel: NSObject {
-    public var fileUrl: String = ""
-    public var thumbUrl: String = ""
+    public var fileUrl: URL?
+    public var thumbUrl: URL?
     public var size: String?
     public var duration: String?
     public var fileType: RKFileType?
@@ -25,27 +25,27 @@ import Kingfisher
 
 public class RKFilePreview {
     
-    public static func thumbnailImage(filePath: String, complete: @escaping ThumbnailClosure) {
-        guard filePath.count > 0 else { return }
-        KingfisherManager.shared.cache.retrieveImage(forKey: filePath) { result in
+    public static func thumbnailImage(fileUrl: URL, complete: @escaping ThumbnailClosure) {
+        
+        KingfisherManager.shared.cache.retrieveImage(forKey: fileUrl.absoluteString) { result in
             switch result {
             case .failure(_):
-                fetchThumbnailImage(filePath: filePath, complete: complete)
+                fetchThumbnailImage(fileUrl: fileUrl, complete: complete)
             case let .success(data):
                 if data.cacheType != .none, let image = data.image {
                     complete(image)
                 } else {
-                    fetchThumbnailImage(filePath: filePath, complete: complete)
+                    fetchThumbnailImage(fileUrl: fileUrl, complete: complete)
                 }
             }
         }
     }
     
-    private static func fetchThumbnailImage(filePath: String, complete: @escaping ThumbnailClosure) {
+    private static func fetchThumbnailImage(fileUrl: URL, complete: @escaping ThumbnailClosure) {
         DispatchQueue.global().async {
-            RKThumbnailImage.thumbnailImage(filePath) { image in
+            RKThumbnailImage.thumbnailImage(fileUrl) { image in
                 if let image = image {
-                    KingfisherManager.shared.cache.store(image, forKey: filePath)
+                    KingfisherManager.shared.cache.store(image, forKey: fileUrl.absoluteString)
                 }
                 DispatchQueue.main.async {
                     complete(image)
@@ -54,11 +54,10 @@ public class RKFilePreview {
         }
     }
 
-    public static func previewDocFile(filePath: String) {
-        guard filePath.count > 0 else { return }
+    public static func previewDocFile(fileUrl: URL) {
         
         let vc = RKDocumentPreviewVC()
-        vc.filePath = filePath
+        vc.fileUrl = fileUrl
         UIApplication.topViewController()?.navigationController?.pushViewController(vc, animated: true)
     }
     

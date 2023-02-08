@@ -5,6 +5,7 @@ platform :ios, '11.0'
 target 'RKBaseModule_Example' do
   
   pod 'RKBaseModule/RKFilePreview', :path => '../'
+  #pod 'RKBaseModule/RKFilePreview', :git => "https://github.com/rokid-cd/RKBaseModule"
   
   target 'RKBaseModule_Tests' do
     inherit! :search_paths

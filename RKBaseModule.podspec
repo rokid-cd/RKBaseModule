@@ -49,7 +49,6 @@ TODO: Add long description of the pod here.
   end
   
   s.subspec 'RKHUD' do |ss|
-    ss.resources    = 'RKBaseModule/Assets/RKBaseModule.bundle'
     ss.source_files = 'RKBaseModule/Classes/RKHUD/**/*'
   end
   
@@ -58,8 +57,8 @@ TODO: Add long description of the pod here.
   end
   
   s.subspec 'RKPrompt' do |ss|
-    ss.dependency 'RKBaseModule/RKHUD'
     ss.source_files = 'RKBaseModule/Classes/RKPrompt/**/*'
+    ss.dependency 'RKBaseModule/RKHUD'
   end
   
   s.subspec 'RKReplayKit' do |ss|

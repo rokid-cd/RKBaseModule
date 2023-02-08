@@ -186,8 +186,10 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
             
         }
         if NSNotification.Name.MPMoviePlayerFirstVideoFrameRendered == notify.name {
-            mediaPlayer.shouldHideVideo = false
-            mediaPlayer.view.isHidden = false
+            UIView.animate(withDuration: 0.2) {
+                self.imageView.image = nil
+                self.mediaPlayer.view.isHidden = false
+            }
         }
     }
     
@@ -201,7 +203,7 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     
     func reloadVideo(_ model: RKFileModel) {
         
-        guard let url = URL(string: model.fileUrl) else { return }
+        guard let url = model.fileUrl else { return }
         
         videoModel = model
         
@@ -221,7 +223,6 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     }
     
     private func initializeUIValue() {
-        mediaPlayer.shouldHideVideo = true
         mediaPlayer.view.isHidden = true
         sliderView.setValue(0, animated: false)
         sliderView.isHidden = false
@@ -243,11 +244,11 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     }
     
     private func thumImage() {
-        guard let model = videoModel else { return }
-        RKFilePreview.thumbnailImage(filePath: model.fileUrl) {[weak self] image in
+        guard let url = videoModel?.fileUrl else { return }
+        RKFilePreview.thumbnailImage(fileUrl: url) {[weak self] image in
             if let image = image {
                 self?.imageView.image = image
-            } else if let thumbUrl = URL(string: model.thumbUrl) {
+            } else if let thumbUrl = self?.videoModel?.thumbUrl {
                 RKDownloadManager.trustHost(fileUrl: thumbUrl)
                 self?.imageView.kf.setImage(with: thumbUrl)
             }
@@ -267,7 +268,7 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
             playButton.isSelected = false
         } else {
             playButton.isSelected = true
-            if reloading, let model = videoModel, let url = URL(string: model.fileUrl) {
+            if reloading, let model = videoModel, let url = model.fileUrl {
                 mediaPlayer.reload(url)
             } else {
                 mediaPlayer.play()
@@ -340,11 +341,9 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
 extension RKPreviewVideoCell {
     @objc private func downloadAction() {
         
-        guard let model = videoModel else { return }
+        guard let fileUrl = videoModel?.fileUrl else { return }
         RKPrompt.showLoading(inView: self)
-        RKDownloadManager.downLoadFile(fileUrlPath: model.fileUrl) { progress in
-            
-        } completion: {[weak self] error, path in
+        RKDownloadManager.downLoadFile(fileUrl: fileUrl) { _ in } completion: {[weak self] error, path in
             RKPrompt.hidenLoading(inView: self)
             guard let self = self else { return }
             if let _ = error {
@@ -494,16 +493,16 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
     
     func reloadImage(_ model: RKFileModel) {
         
-        guard let url = URL(string: model.fileUrl) else { return }
+        guard let url = model.fileUrl else { return }
         
         RKDownloadManager.trustHost(fileUrl: url)
+        
+        imageView.kf.setImage(with: model.thumbUrl)
         
         if let fileSize = model.size, Double(fileSize) ?? 0 > 0{
             sizeLabel.text = "文件大小：\(fileSize.sizeFormat)"
         }
-        
-        imageView.kf.setImage(with: URL(string: model.thumbUrl))
-        
+
         progressView.progress = 0
         imageView.kf.setImage(with: url, placeholder: nil, options: [.transition(.fade(0.25)),
              .keepCurrentImageWhileLoading]) {[weak self] receivedSize, totalSize in

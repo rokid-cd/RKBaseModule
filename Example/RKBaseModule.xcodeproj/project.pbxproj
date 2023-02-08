@@ -7,14 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		25EC5E0A784C28F3A0A5F928 /* Pods_RKBaseModule_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8CB9371046861C5189C58E2 /* Pods_RKBaseModule_Tests.framework */; };
-		285390D729B91648A7E35E1E /* Pods_RKBaseModule_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8308775DB040D01C5B7FE16 /* Pods_RKBaseModule_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		65A7AD0229934AAF00D96B49 /* 1234.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 65A7AD0129934AAF00D96B49 /* 1234.mp4 */; };
+		65A7AD0429935B8B00D96B49 /* abcd.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 65A7AD0329935B8B00D96B49 /* abcd.pdf */; };
+		AD10C925CEB429CF8541C178 /* Pods_RKBaseModule_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 458977FFC8774D2646F3366A /* Pods_RKBaseModule_Tests.framework */; };
+		FADB2122F340C39605E74084 /* Pods_RKBaseModule_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3675B8ECCEE96806DBE4CD01 /* Pods_RKBaseModule_Example.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +32,9 @@
 /* Begin PBXFileReference section */
 		0A118FBC9481BFDA92CA296A /* RKBaseModule.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = RKBaseModule.podspec; path = ../RKBaseModule.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		0F6E1B74D7EE96E51256C6A3 /* Pods-RKBaseModule_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RKBaseModule_Example.debug.xcconfig"; path = "Target Support Files/Pods-RKBaseModule_Example/Pods-RKBaseModule_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		3675B8ECCEE96806DBE4CD01 /* Pods_RKBaseModule_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RKBaseModule_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A9501844F2B34EC14844FD6 /* Pods-RKBaseModule_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RKBaseModule_Tests.debug.xcconfig"; path = "Target Support Files/Pods-RKBaseModule_Tests/Pods-RKBaseModule_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		458977FFC8774D2646F3366A /* Pods_RKBaseModule_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RKBaseModule_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		45B1F44E73874E829D80E6AE /* Pods-RKBaseModule_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RKBaseModule_Example.release.xcconfig"; path = "Target Support Files/Pods-RKBaseModule_Example/Pods-RKBaseModule_Example.release.xcconfig"; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* RKBaseModule_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RKBaseModule_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -42,11 +46,11 @@
 		607FACE51AFB9204008FA782 /* RKBaseModule_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RKBaseModule_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
+		65A7AD0129934AAF00D96B49 /* 1234.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = 1234.mp4; sourceTree = "<group>"; };
+		65A7AD0329935B8B00D96B49 /* abcd.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = abcd.pdf; sourceTree = "<group>"; };
 		7DE0CF21044994FB68629C3F /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		9B73C4B51160BA72C0D60350 /* Pods-RKBaseModule_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RKBaseModule_Tests.release.xcconfig"; path = "Target Support Files/Pods-RKBaseModule_Tests/Pods-RKBaseModule_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		B246662D77134895A548BD4B /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
-		B8308775DB040D01C5B7FE16 /* Pods_RKBaseModule_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RKBaseModule_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B8CB9371046861C5189C58E2 /* Pods_RKBaseModule_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RKBaseModule_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				285390D729B91648A7E35E1E /* Pods_RKBaseModule_Example.framework in Frameworks */,
+				FADB2122F340C39605E74084 /* Pods_RKBaseModule_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				25EC5E0A784C28F3A0A5F928 /* Pods_RKBaseModule_Tests.framework in Frameworks */,
+				AD10C925CEB429CF8541C178 /* Pods_RKBaseModule_Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,6 +97,8 @@
 		607FACD21AFB9204008FA782 /* Example for RKBaseModule */ = {
 			isa = PBXGroup;
 			children = (
+				65A7AD0329935B8B00D96B49 /* abcd.pdf */,
+				65A7AD0129934AAF00D96B49 /* 1234.mp4 */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -142,8 +148,8 @@
 		6FFDE84A69CFD7CF2A51EB55 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B8308775DB040D01C5B7FE16 /* Pods_RKBaseModule_Example.framework */,
-				B8CB9371046861C5189C58E2 /* Pods_RKBaseModule_Tests.framework */,
+				3675B8ECCEE96806DBE4CD01 /* Pods_RKBaseModule_Example.framework */,
+				458977FFC8774D2646F3366A /* Pods_RKBaseModule_Tests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -170,8 +176,8 @@
 				607FACCC1AFB9204008FA782 /* Sources */,
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
-				7BC1CC32466DD8E311973799 /* [CP] Embed Pods Frameworks */,
-				ADF04FAC9C16D5C7E938EEE7 /* [CP] Copy Pods Resources */,
+				FC347BC6785857142DD46768 /* [CP] Copy Pods Resources */,
+				18B6B6BCD5FB419A110EB543 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -250,6 +256,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
+				65A7AD0429935B8B00D96B49 /* abcd.pdf in Resources */,
+				65A7AD0229934AAF00D96B49 /* 1234.mp4 in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
 			);
@@ -265,6 +273,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		18B6B6BCD5FB419A110EB543 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RKBaseModule_Example/Pods-RKBaseModule_Example-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
+				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RKBaseModule_Example/Pods-RKBaseModule_Example-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		7075B0C936832D4781E873C4 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -287,44 +315,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7BC1CC32466DD8E311973799 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RKBaseModule_Example/Pods-RKBaseModule_Example-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
-				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RKBaseModule_Example/Pods-RKBaseModule_Example-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		ADF04FAC9C16D5C7E938EEE7 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RKBaseModule_Example/Pods-RKBaseModule_Example-resources.sh",
-				"${PODS_ROOT}/../../RKBaseModule/Assets/RKBaseModule.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RKBaseModule.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RKBaseModule_Example/Pods-RKBaseModule_Example-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		AE56A86C414D41F0458C015E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -345,6 +335,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FC347BC6785857142DD46768 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RKBaseModule_Example/Pods-RKBaseModule_Example-resources.sh",
+				"${PODS_ROOT}/../../RKBaseModule/Assets/RKBaseModule.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RKBaseModule.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RKBaseModule_Example/Pods-RKBaseModule_Example-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

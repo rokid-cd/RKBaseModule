@@ -8,9 +8,9 @@
 import UIKit
 import Kingfisher
 
-class RKDownloadManager: NSObject {
-    typealias CompletionClosure = ((Error?, String) -> Void)
-    typealias ProgressClosure = ((Progress) -> Void)
+public class RKDownloadManager: NSObject {
+    public typealias CompletionClosure = ((Error?, String) -> Void)
+    public typealias ProgressClosure = ((Progress) -> Void)
     
     static var sessionManager: SessionManager = {
         var configuration = SessionConfiguration()
@@ -21,12 +21,17 @@ class RKDownloadManager: NSObject {
         return manager
     }()
     
-    static func cacheFile(fileUrlPath: String) -> Bool {
-        return sessionManager.cache.filePath(url: fileUrlPath) != nil
+    public static func cacheFilePath(fileUrl: URL) -> String? {
+        return sessionManager.cache.filePath(url: fileUrl)
     }
     
-    static func downLoadFile(fileUrlPath: String, progress: ProgressClosure? = nil, completion: CompletionClosure? = nil) {
-        sessionManager.download(fileUrlPath)?.progress { (task) in
+    public static func isCache(fileUrl: URL) -> Bool {
+        guard let cachePath = cacheFilePath(fileUrl: fileUrl) else { return false }
+        return FileManager.default.fileExists(atPath: cachePath)
+    }
+    
+    public static func downLoadFile(fileUrl: URL, progress: ProgressClosure? = nil, completion: CompletionClosure? = nil) {
+        sessionManager.download(fileUrl)?.progress { (task) in
             progress?(task.progress)
             
         }.completion { (task) in
@@ -39,35 +44,44 @@ class RKDownloadManager: NSObject {
         }
     }
     
-    static func suspend(filePath: String) {
-        sessionManager.suspend(filePath)
+    public static func suspend(fileUrl: URL) {
+        sessionManager.suspend(fileUrl)
     }
     
-    static func resume(filePath: String) {
-        sessionManager.start(filePath)
+    public static func resume(fileUrl: URL) {
+        sessionManager.start(fileUrl)
     }
     
-    static func cancel(filePath: String) {
-        sessionManager.cancel(filePath)
+    public static func cancel(fileUrl: URL) {
+        sessionManager.cancel(fileUrl)
     }
     
-    static func videoSize(fileUrl: URL, complete: @escaping (String)->()) {
-        
-        var request = URLRequest(url: fileUrl)
-        request.timeoutInterval = 10
-        request.httpMethod = "HEAD"
-        let session = URLSession(configuration: URLSessionConfiguration.default, delegate: SessionDelegate(), delegateQueue: nil)
-        session.dataTask(with: request) { data, response, error in
-            if let response = response as? HTTPURLResponse,
-               let length = response.allHeaderFields["Content-Length"] as? String {
-                DispatchQueue.main.async {
-                    complete(length)
+    public static func videoSize(fileUrl: URL, complete: @escaping (String)->()) {
+        if fileUrl.isFileURL {
+            DispatchQueue.global().async {
+                if let data = try? Data(contentsOf: fileUrl, options: .uncachedRead) {
+                    DispatchQueue.main.async {
+                        complete(String(data.count))
+                    }
                 }
             }
-        }.resume()
+        } else {
+            var request = URLRequest(url: fileUrl)
+            request.timeoutInterval = 10
+            request.httpMethod = "HEAD"
+            let session = URLSession(configuration: URLSessionConfiguration.default, delegate: SessionDelegate(), delegateQueue: nil)
+            session.dataTask(with: request) { data, response, error in
+                if let response = response as? HTTPURLResponse,
+                   let length = response.allHeaderFields["Content-Length"] as? String {
+                    DispatchQueue.main.async {
+                        complete(length)
+                    }
+                }
+            }.resume()
+        }
     }
     
-    static func trustHost(fileUrl: URL) {
+    public static func trustHost(fileUrl: URL) {
         if var trustedHosts = ImageDownloader.default.trustedHosts {
             trustedHosts.insert(fileUrl.host ?? "")
             ImageDownloader.default.trustedHosts = trustedHosts

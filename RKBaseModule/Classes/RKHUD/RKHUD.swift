@@ -34,7 +34,6 @@ public enum AnimatedIcon {
 
 // MARK: -
 //-----------------------------------------------------------------------------------------------------------------------------------------------
-@available(iOS 13.0, *)
 public extension RKHUD {
 
     class var animationType: AnimationType {
@@ -73,7 +72,7 @@ public extension RKHUD {
     }
 
     class var imageSuccess: UIImage {
-        get { RKHUD.imageSuccess }
+        get { shared.imageSuccess }
         set { shared.imageSuccess = newValue }
     }
 
@@ -230,8 +229,8 @@ public class RKHUD: UIView {
     private var colorProgress      = UIColor.lightGray
 
     private var fontStatus         = UIFont.boldSystemFont(ofSize: 20)
-    private var imageSuccess       = Bundle.rkImage(named: "rk_success")
-    private var imageError         = Bundle.rkImage(named: "rk_error")
+    private var imageSuccess       = UIImage()
+    private var imageError         = UIImage()
 
     private let keyboardWillShow    = UIResponder.keyboardWillShowNotification
     private let keyboardWillHide    = UIResponder.keyboardWillHideNotification

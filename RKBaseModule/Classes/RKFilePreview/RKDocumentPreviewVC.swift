@@ -11,7 +11,7 @@ import QuickLook
 
 class RKDocumentPreviewVC: UIViewController {
     
-    var filePath: String?
+    var fileUrl: URL?
     
     private var loacalFileURL: URL?
     
@@ -178,7 +178,7 @@ class RKDocumentPreviewVC: UIViewController {
             make.centerX.equalToSuperview()
             make.width.equalTo(210)
             make.height.equalTo(4)
-            make.top.equalTo(infoLab.snp_bottom).offset(12)
+            make.top.equalTo(infoLab.snp.bottom).offset(12)
         }
         
         actionView.snp.makeConstraints { make in
@@ -196,18 +196,22 @@ class RKDocumentPreviewVC: UIViewController {
     
     func loadData() {
         
-        guard let path = filePath else { return }
+        guard let fileUrl = fileUrl else { return }
         
-        let fileUrl = URL(fileURLWithPath: path)
         title = fileUrl.lastPathComponent
         let extensionName = fileUrl.pathExtension
         let fileType = RKDocumentFileType(rawValue: extensionName) ?? .other
         imageView.image = fileType.image
         titleLab.text = title
         
+        if fileUrl.isFileURL {
+            self.showDocumentInteractionController(fileUrl: fileUrl)
+            return
+        }
+        
         self.infoLab.text = "正在下载(0/0)"
         self.actionState = .pause
-        RKDownloadManager.downLoadFile(fileUrlPath: path) {[weak self] progress in
+        RKDownloadManager.downLoadFile(fileUrl: fileUrl) {[weak self] progress in
             let totalFormat = String(progress.totalUnitCount).sizeFormat
             let downFormat = String(progress.completedUnitCount).sizeFormat
             self?.infoLab.text = "正在下载(\(downFormat)/\(totalFormat))"
@@ -258,12 +262,12 @@ class RKDocumentPreviewVC: UIViewController {
             vc.presentOptionsMenu(from: actionButton.frame, in: self.view, animated: true)
             
         case .download:
-            guard let path = filePath else { return }
-            RKDownloadManager.resume(filePath: path)
+            guard let fileUrl = fileUrl else { return }
+            RKDownloadManager.resume(fileUrl: fileUrl)
             actionState = .pause
         case .pause:
-            guard let path = filePath else { return }
-            RKDownloadManager.suspend(filePath: path)
+            guard let fileUrl = fileUrl else { return }
+            RKDownloadManager.suspend(fileUrl: fileUrl)
             actionState = .download
         case .fail:
             loadData()
