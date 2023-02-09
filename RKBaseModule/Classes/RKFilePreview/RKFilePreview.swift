@@ -24,36 +24,8 @@ import Kingfisher
 }
 
 public class RKFilePreview {
-    
-    public static func thumbnailImage(fileUrl: URL, complete: @escaping ThumbnailClosure) {
-        
-        KingfisherManager.shared.cache.retrieveImage(forKey: fileUrl.absoluteString) { result in
-            switch result {
-            case .failure(_):
-                fetchThumbnailImage(fileUrl: fileUrl, complete: complete)
-            case let .success(data):
-                if data.cacheType != .none, let image = data.image {
-                    complete(image)
-                } else {
-                    fetchThumbnailImage(fileUrl: fileUrl, complete: complete)
-                }
-            }
-        }
-    }
-    
-    private static func fetchThumbnailImage(fileUrl: URL, complete: @escaping ThumbnailClosure) {
-        DispatchQueue.global().async {
-            RKThumbnailImage.thumbnailImage(fileUrl) { image in
-                if let image = image {
-                    KingfisherManager.shared.cache.store(image, forKey: fileUrl.absoluteString)
-                }
-                DispatchQueue.main.async {
-                    complete(image)
-                }
-            }
-        }
-    }
 
+    // 文档预览
     public static func previewDocFile(fileUrl: URL) {
         
         let vc = RKDocumentPreviewVC()
@@ -61,6 +33,7 @@ public class RKFilePreview {
         UIApplication.topViewController()?.navigationController?.pushViewController(vc, animated: true)
     }
     
+    // 视频 图片预览
     public static func previewFile(fileModels: [RKFileModel], index: Int, push: Bool = false) {
         guard fileModels.count > 0, let vc = UIApplication.topViewController() else { return }
         
@@ -100,6 +73,112 @@ public class RKFilePreview {
             browser.navigationController?.setNavigationBarHidden(true, animated: false)
         } else {
             browser.show()
+        }
+    }
+    
+    //视频 图片文件大小
+    public static func fileSize(fileUrl: URL, complete: @escaping (String)->()) {
+        if fileUrl.isFileURL {
+            DispatchQueue.global().async {
+                if let data = try? Data(contentsOf: fileUrl, options: .uncachedRead) {
+                    DispatchQueue.main.async {
+                        complete(String(data.count))
+                    }
+                }
+            }
+        } else {
+            var request = URLRequest(url: fileUrl)
+            request.timeoutInterval = 10
+            request.httpMethod = "HEAD"
+            let session = URLSession(configuration: URLSessionConfiguration.default, delegate: SessionDelegate(), delegateQueue: nil)
+            session.dataTask(with: request) { data, response, error in
+                if let response = response as? HTTPURLResponse,
+                   let length = response.allHeaderFields["Content-Length"] as? String {
+                    DispatchQueue.main.async {
+                        complete(length)
+                    }
+                }
+            }.resume()
+        }
+    }
+    
+    // 获取视频文件缩略图
+    public static func videoThumbnailImage(fileUrl: URL, complete: @escaping ThumbnailClosure) {
+        
+        KingfisherManager.shared.cache.retrieveImage(forKey: fileUrl.absoluteString) { result in
+            switch result {
+            case .failure(_):
+                fetchVideoThumbnailImage(fileUrl: fileUrl, complete: complete)
+            case let .success(data):
+                if data.cacheType != .none, let image = data.image {
+                    complete(image, fileUrl)
+                } else {
+                    fetchVideoThumbnailImage(fileUrl: fileUrl, complete: complete)
+                }
+            }
+        }
+    }
+    
+    private static func fetchVideoThumbnailImage(fileUrl: URL, complete: @escaping ThumbnailClosure) {
+        DispatchQueue.global().async {
+            RKThumbnailImage.thumbnailImage(fileUrl) { image, path in
+                if let image = image {
+                    KingfisherManager.shared.cache.store(image, forKey: fileUrl.absoluteString)
+                }
+                DispatchQueue.main.async {
+                    complete(image, fileUrl)
+                }
+            }
+        }
+    }
+}
+
+
+public extension UIImageView {
+    func rk_videoThumbnailImage(fileUrl: URL?, placeholder: UIImage? = nil, completeClosure: ((UIImage?)-> Void)? = nil) {
+        image = placeholder
+        guard let fileUrl = fileUrl else {
+            completeClosure?(nil)
+            return
+        }
+        tag = fileUrl.hashValue
+        RKDownloadManager.trustHost(fileUrl: fileUrl)
+        RKFilePreview.videoThumbnailImage(fileUrl: fileUrl) { image, url in
+            if self.tag == url.hashValue {
+                completeClosure?(image)
+                if let image = image { self.image = image }
+                
+            }
+        }
+    }
+}
+
+public extension UIButton {
+    func rk_videoThumbnailImage(fileUrl: URL?, placeholder: UIImage? = nil, completeClosure: ((UIImage?)-> Void)? = nil) {
+        setImage(placeholder, for: .normal)
+        guard let fileUrl = fileUrl else {
+            completeClosure?(nil)
+            return
+        }
+        tag = fileUrl.hashValue
+        RKDownloadManager.trustHost(fileUrl: fileUrl)
+        RKFilePreview.videoThumbnailImage(fileUrl: fileUrl) { image, url in
+            if self.tag == fileUrl.hashValue {
+                completeClosure?(image)
+                if let image = image { self.setImage(image, for: .normal) }
+                
+            }
+        }
+    }
+}
+
+public extension UILabel {
+    func rk_fileSize(fileUrl: URL, complete: @escaping (String)->()) {
+        tag = fileUrl.hashValue
+        RKFilePreview.fileSize(fileUrl: fileUrl) { size in
+            if self.tag == fileUrl.hashValue {
+                complete(size)
+            }
         }
     }
 }

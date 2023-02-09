@@ -54,39 +54,15 @@ public class RKDownloadManager: NSObject {
     
     public static func cancel(fileUrl: URL) {
         sessionManager.cancel(fileUrl)
-    }
+    }    
     
-    public static func videoSize(fileUrl: URL, complete: @escaping (String)->()) {
-        if fileUrl.isFileURL {
-            DispatchQueue.global().async {
-                if let data = try? Data(contentsOf: fileUrl, options: .uncachedRead) {
-                    DispatchQueue.main.async {
-                        complete(String(data.count))
-                    }
-                }
-            }
-        } else {
-            var request = URLRequest(url: fileUrl)
-            request.timeoutInterval = 10
-            request.httpMethod = "HEAD"
-            let session = URLSession(configuration: URLSessionConfiguration.default, delegate: SessionDelegate(), delegateQueue: nil)
-            session.dataTask(with: request) { data, response, error in
-                if let response = response as? HTTPURLResponse,
-                   let length = response.allHeaderFields["Content-Length"] as? String {
-                    DispatchQueue.main.async {
-                        complete(length)
-                    }
-                }
-            }.resume()
-        }
-    }
-    
-    public static func trustHost(fileUrl: URL) {
+    public static func trustHost(fileUrl: URL?) {
+        guard let url = fileUrl else { return }
         if var trustedHosts = ImageDownloader.default.trustedHosts {
-            trustedHosts.insert(fileUrl.host ?? "")
+            trustedHosts.insert(url.host ?? "")
             ImageDownloader.default.trustedHosts = trustedHosts
         } else {
-            let trustedHosts: Set<String> = [fileUrl.host ?? ""]
+            let trustedHosts: Set<String> = [url.host ?? ""]
             ImageDownloader.default.trustedHosts = trustedHosts
         }
     }

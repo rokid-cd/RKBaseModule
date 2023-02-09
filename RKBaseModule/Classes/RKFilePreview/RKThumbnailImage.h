@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^ThumbnailClosure)( UIImage * _Nullable image);
+typedef void(^ThumbnailClosure)(UIImage * _Nullable image, NSURL *url);
 
 @interface RKThumbnailImage : NSObject
 

@@ -23,15 +23,22 @@ public class RKPrompt {
     public var promptDelegate: RKPromptProtocol?
     
     public static func showToast(withText: String, inView: UIView?) {
-        share.promptDelegate?.showToast(withText: withText, inView: inView) ?? RKHUD.showToast(status: withText)
+        DispatchQueue.main.async {
+            share.promptDelegate?.showToast(withText: withText, inView: inView) ?? RKHUD.showToast(status: withText)
+        }
+        
     }
     
     public static func showLoading(inView: UIView?) {
-        share.promptDelegate?.showLoading(inView: inView) ?? RKHUD.show()
+        DispatchQueue.main.async {
+            share.promptDelegate?.showLoading(inView: inView) ?? RKHUD.show()
+        }
     }
     
     public static func hidenLoading(inView: UIView?) {
-        share.promptDelegate?.hidenLoading(inView: inView) ?? RKHUD.remove()
+        DispatchQueue.main.async {
+            share.promptDelegate?.hidenLoading(inView: inView) ?? RKHUD.remove()
+        }
     }
 }
 

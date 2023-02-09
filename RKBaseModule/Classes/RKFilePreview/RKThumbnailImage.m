@@ -11,10 +11,11 @@
 @implementation RKThumbnailImage
 
 + (void)thumbnailImage:(NSURL *)fileUrl complete:(ThumbnailClosure)closure {
+    
     KSYMediaInfoProber *prober = [[KSYMediaInfoProber alloc] initWithContentURL:fileUrl];
     prober.timeout = 15;
     UIImage *image = [prober getVideoThumbnailImageAtTime:0 width:0 height:0];
-    closure(image);
+    closure(image, fileUrl);
 }
 
 @end

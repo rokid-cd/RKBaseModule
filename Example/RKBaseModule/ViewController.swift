@@ -13,14 +13,8 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
 //        RKPrompt.share.promptDelegate = self
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
     @IBAction func toastAction(_ sender: UIButton) {
@@ -94,5 +88,12 @@ extension ViewController: RKPromptProtocol {
     
     func hidenLoading(inView: UIView?) {
         print("hidenLoading")
+    }
+    
+    
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        
     }
 }

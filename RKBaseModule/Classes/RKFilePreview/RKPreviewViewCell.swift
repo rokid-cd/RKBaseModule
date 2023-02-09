@@ -212,12 +212,12 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         mediaPlayer.setUrl(url)
         mediaPlayer.prepareToPlay()
         
-        if let fileSize = model.size {
-            self.sizeLabel.text = "文件大小：\(fileSize.sizeFormat)"
+        if let fileSize = model.size, Double(fileSize) ?? 0 > 0 {
+            sizeLabel.text = "文件大小：\(fileSize.sizeFormat)"
         } else {
-            RKDownloadManager.videoSize(fileUrl: url) { fileSize in
-                self.sizeLabel.text = "文件大小：\(fileSize.sizeFormat)"
-                self.videoModel?.size = fileSize
+            sizeLabel.rk_fileSize(fileUrl: url) { [weak self] fileSize in
+                self?.sizeLabel.text = "文件大小：\(fileSize.sizeFormat)"
+                self?.videoModel?.size = fileSize
             }
         }
     }
@@ -245,11 +245,8 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     
     private func thumImage() {
         guard let url = videoModel?.fileUrl else { return }
-        RKFilePreview.thumbnailImage(fileUrl: url) {[weak self] image in
-            if let image = image {
-                self?.imageView.image = image
-            } else if let thumbUrl = self?.videoModel?.thumbUrl {
-                RKDownloadManager.trustHost(fileUrl: thumbUrl)
+        imageView.rk_videoThumbnailImage(fileUrl: url) {[weak self] image in
+            if image == nil, let thumbUrl = self?.videoModel?.thumbUrl {
                 self?.imageView.kf.setImage(with: thumbUrl)
             }
         }
@@ -343,13 +340,17 @@ extension RKPreviewVideoCell {
         
         guard let fileUrl = videoModel?.fileUrl else { return }
         RKPrompt.showLoading(inView: self)
-        RKDownloadManager.downLoadFile(fileUrl: fileUrl) { _ in } completion: {[weak self] error, path in
-            RKPrompt.hidenLoading(inView: self)
-            guard let self = self else { return }
-            if let _ = error {
-                RKPrompt.showToast(withText: "下载失败", inView: self)
-            } else {
-                self.saveLoacalVideo(URL(fileURLWithPath: path))
+        if fileUrl.isFileURL {
+            self.saveLoacalVideo(fileUrl)
+        } else {
+            RKDownloadManager.downLoadFile(fileUrl: fileUrl) { _ in } completion: {[weak self] error, path in
+                guard let self = self else { return }
+                if let _ = error {
+                    RKPrompt.hidenLoading(inView: self)
+                    RKPrompt.showToast(withText: "下载失败", inView: self)
+                } else {
+                    self.saveLoacalVideo(fileUrl)
+                }
             }
         }
     }
@@ -359,10 +360,13 @@ extension RKPreviewVideoCell {
         PHPhotoLibrary.shared().performChanges {
             PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: fileUrl)
         } completionHandler: { success, error in
-            if (success) {
-                RKPrompt.showToast(withText: "保存成功", inView: self)
-            } else {
-                RKPrompt.showToast(withText: "保存失败", inView: self)
+            DispatchQueue.main.async {
+                RKPrompt.hidenLoading(inView: self)
+                if (success) {
+                    RKPrompt.showToast(withText: "保存成功", inView: self)
+                } else {
+                    RKPrompt.showToast(withText: "保存失败", inView: self)
+                }
             }
         }
     }
@@ -444,6 +448,7 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
 
     let progressView = JXPhotoBrowserProgressView()
     
+    var imageModel: RKFileModel?
     lazy var downloadButton: UIButton = {
         $0.setImage(Bundle.rkImage(named: "rk_chat_down"), for: .normal)
         $0.addTarget(self, action: #selector(downloadAction), for: .touchUpInside)
@@ -493,23 +498,26 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
     
     func reloadImage(_ model: RKFileModel) {
         
-        guard let url = model.fileUrl else { return }
+        imageModel = model
         
-        RKDownloadManager.trustHost(fileUrl: url)
+        RKDownloadManager.trustHost(fileUrl: model.fileUrl)
         
         imageView.kf.setImage(with: model.thumbUrl)
         
-        if let fileSize = model.size, Double(fileSize) ?? 0 > 0{
+        if let fileSize = model.size, Double(fileSize) ?? 0 > 0 {
             sizeLabel.text = "文件大小：\(fileSize.sizeFormat)"
+        } else if let url = model.fileUrl {
+            sizeLabel.rk_fileSize(fileUrl: url) { [weak self] fileSize in
+                self?.sizeLabel.text = "文件大小：\(fileSize.sizeFormat)"
+                self?.imageModel?.size = fileSize
+            }
         }
 
         progressView.progress = 0
-        imageView.kf.setImage(with: url, placeholder: nil, options: [.transition(.fade(0.25)),
+        imageView.kf.setImage(with: model.fileUrl, placeholder: nil, options: [.transition(.fade(0.25)),
              .keepCurrentImageWhileLoading]) {[weak self] receivedSize, totalSize in
                  guard let self = self else { return }
                  if totalSize > 0 {
-                     let sizeFormat = String(totalSize).sizeFormat
-                     self.sizeLabel.text = "文件大小：\(sizeFormat)"
                      self.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
                  }
              } completionHandler: {[weak self] result in
@@ -517,17 +525,8 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
                  switch result {
                  case .failure(_):
                      self.progressView.progress = 0
-                     self.setNeedsLayout()
-                 case let .success(data):
+                 case .success(_):
                      self.progressView.progress = 1.0
-                     let image = data.image
-                     DispatchQueue.global().async {
-                         let sizeFormat = String(image.jpegData(compressionQuality: 1.0)?.count ?? 0).sizeFormat
-                         DispatchQueue.main.async {
-                             self.sizeLabel.text = "文件大小：\(sizeFormat)"
-                         }
-                     }
-                     self.setNeedsLayout()
                  }
              }
     }
