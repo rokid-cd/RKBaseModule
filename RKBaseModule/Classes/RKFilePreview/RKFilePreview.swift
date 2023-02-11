@@ -182,3 +182,9 @@ public extension UILabel {
         }
     }
 }
+
+extension Bundle {
+    class func rkImage(named name: String) -> UIImage? {
+        return Bundle.rkImage(named: name, "RKBaseModule", RKFilePreview.self)
+    }
+}

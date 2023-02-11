@@ -7,8 +7,6 @@
 
 import Foundation
 
-class RKBundle { }
-
 extension UIColor {
     convenience init(hex:Int32) {
         self.init(hex: hex, alpha: 1)
@@ -84,18 +82,24 @@ extension UIApplication {
 }
 
 
-extension Bundle {
-    class func rkImage(named name: String) -> UIImage {
-        let primaryBundle = Bundle(for: RKBundle.self)
+public extension Bundle {
+    class func rkImage(named name: String, _ bundleName: String, _ aclass: AnyClass) -> UIImage? {
+        let primaryBundle = Bundle(for: aclass)
         if let image = UIImage(named: name, in: primaryBundle, compatibleWith: nil) {
             return image
-        } else if
-            let subBundleUrl = primaryBundle.url(forResource: "RKBaseModule", withExtension: "bundle"),
-            let subBundle = Bundle(url: subBundleUrl),
-            let image = UIImage(named: name, in: subBundle, compatibleWith: nil)
-        {
+            
+        } else if let image = UIImage(named: name, in: Bundle.rkBundle(bundleName, aclass), compatibleWith: nil) {
             return image
         }
-        return UIImage()
+        return nil
+    }
+    
+    class func rkBundle(_ bundleName: String, _ aclass: AnyClass) -> Bundle {
+        let primaryBundle = Bundle(for: aclass)
+        if let subBundleUrl = primaryBundle.url(forResource: bundleName, withExtension: "bundle"),
+           let subBundle = Bundle(url: subBundleUrl) {
+            return subBundle
+        }
+        return Bundle.main
     }
 }

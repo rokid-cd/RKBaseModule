@@ -83,7 +83,7 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     private lazy var sliderView: ARIMSlider = {
         $0.minimumTrackTintColor = .init(hex: 0x194BFB)
         $0.maximumTrackTintColor = UIColor.white.withAlphaComponent(0.6)
-        $0.setThumbImage(Bundle.rkImage(named: "rk_video_thumb").cicleImage(), for: .normal)
+        $0.setThumbImage(Bundle.rkImage(named: "rk_video_thumb")?.cicleImage(), for: .normal)
         $0.addTarget(self, action: #selector(sliderBeginAction), for: .touchDown)
         $0.addTarget(self, action: #selector(sliderChangeAction), for: .valueChanged)
         $0.addTarget(self, action: #selector(sliderAction), for: .touchUpInside)

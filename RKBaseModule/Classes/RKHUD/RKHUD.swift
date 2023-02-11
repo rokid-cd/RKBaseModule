@@ -314,7 +314,7 @@ public class RKHUD: UIView {
     private func setupBackground(_ interaction: Bool) {
 
         if (viewBackground == nil) {
-            let mainWindow = UIApplication.shared.windows.first ?? UIWindow()
+            let mainWindow = UIApplication.shared.keyWindow ?? UIApplication.shared.windows.first ?? UIWindow()
             viewBackground = UIView(frame: self.bounds)
             mainWindow.addSubview(viewBackground!)
         }
