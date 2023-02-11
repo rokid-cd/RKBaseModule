@@ -349,7 +349,7 @@ extension RKPreviewVideoCell {
                     RKPrompt.hidenLoading(inView: self)
                     RKPrompt.showToast(withText: "下载失败", inView: self)
                 } else {
-                    self.saveLoacalVideo(fileUrl)
+                    self.saveLoacalVideo(URL(fileURLWithPath: path))
                 }
             }
         }

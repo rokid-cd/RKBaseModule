@@ -33,6 +33,15 @@ extension String {
         }
         return String(format:"%4.2f %@", convertedValue,tokens[multiplyFactor])
     }
+    
+    var urlEncod: String? {
+        return self.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+    }
+    
+    var isChinese: Bool {
+        let result = unicodeScalars.first { $0 >= "\u{4E00}" && $0 <= "\u{9FA5}" }
+        return result != nil
+    }
 }
 
 extension UIImage {
