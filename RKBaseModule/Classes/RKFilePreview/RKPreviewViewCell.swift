@@ -133,6 +133,7 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         NotificationCenter.default.removeObserver(self)
         mediaPlayer.removeObserver(self, forKeyPath: "currentPlaybackTime")
         mediaPlayer.stop()
+        RKPrompt.hidenLoading()
     }
     
     override func layoutSubviews() {
@@ -278,6 +279,7 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         mediaPlayer.pause()
         playButton.isSelected = false
         changeControlState(hidden: false)
+        RKPrompt.hidenLoading()
     }
     
     private func timerShowControl() {

@@ -103,105 +103,83 @@ public extension RKHUD {
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    class func showToast(status: String, interaction: Bool = true) {
-        
-        DispatchQueue.main.async {
-            shared.animationType = .none
-            shared.setup(status: status, hide: true, interaction: interaction)
-        }
+    class func showToast(withText: String?, interaction: Bool = true, inView: UIView? = nil) {
+        guard let withText = withText else { return }
+        shared.animationType = .none
+        shared.setup(status: withText, hide: true, interaction: interaction, inView: inView)
     }
     
     
-    class func show(_ status: String? = nil, interaction: Bool = true) {
+    class func show(_ status: String? = nil, interaction: Bool = true, inView: UIView? = nil) {
         
-        DispatchQueue.main.async {
-            shared.resetType()
-            shared.setup(status: status, hide: false, interaction: interaction)
-        }
+        shared.resetType()
+        shared.setup(status: status, hide: false, interaction: interaction, inView: inView)
     }
 
     // MARK: - Animated Icon
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    class func show(_ status: String? = nil, icon: AnimatedIcon, interaction: Bool = true, delay: TimeInterval? = nil) {
+    class func show(_ status: String? = nil, icon: AnimatedIcon, interaction: Bool = true, delay: TimeInterval? = nil, inView: UIView? = nil) {
 
-        DispatchQueue.main.async {
-            shared.resetType()
-            shared.setup(status: status, animatedIcon: icon, hide: true, interaction: interaction, delay: delay)
-        }
+        shared.resetType()
+        shared.setup(status: status, animatedIcon: icon, hide: true, interaction: interaction, delay: delay, inView: inView)
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    class func showSucceed(_ status: String? = nil, interaction: Bool = true, delay: TimeInterval? = nil) {
+    class func showSucceed(_ status: String? = nil, interaction: Bool = true, delay: TimeInterval? = nil, inView: UIView? = nil) {
 
-        DispatchQueue.main.async {
-            shared.resetType()
-            shared.setup(status: status, animatedIcon: .succeed, hide: true, interaction: interaction, delay: delay)
-        }
+        shared.resetType()
+        shared.setup(status: status, animatedIcon: .succeed, hide: true, interaction: interaction, delay: delay, inView: inView)
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    class func showFailed(_ status: String? = nil, interaction: Bool = true, delay: TimeInterval? = nil) {
+    class func showFailed(_ status: String? = nil, interaction: Bool = true, delay: TimeInterval? = nil, inView: UIView? = nil) {
 
-        DispatchQueue.main.async {
-            shared.resetType()
-            shared.setup(status: status, animatedIcon: .failed, hide: true, interaction: interaction, delay: delay)
-        }
+        shared.resetType()
+        shared.setup(status: status, animatedIcon: .failed, hide: true, interaction: interaction, delay: delay, inView: inView)
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    class func showAdded(_ status: String? = nil, interaction: Bool = true, delay: TimeInterval? = nil) {
+    class func showAdded(_ status: String? = nil, interaction: Bool = true, delay: TimeInterval? = nil, inView: UIView? = nil) {
 
-        DispatchQueue.main.async {
-            shared.resetType()
-            shared.setup(status: status, animatedIcon: .added, hide: true, interaction: interaction, delay: delay)
-        }
+        shared.resetType()
+        shared.setup(status: status, animatedIcon: .added, hide: true, interaction: interaction, delay: delay, inView: inView)
     }
 
     // MARK: - Static Image
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    class func show(_ status: String? = nil, image: UIImage, interaction: Bool = true, delay: TimeInterval? = nil) {
+    class func show(_ status: String? = nil, image: UIImage, interaction: Bool = true, delay: TimeInterval? = nil, inView: UIView? = nil) {
 
-        DispatchQueue.main.async {
-            shared.resetType()
-            shared.setup(status: status, staticImage: image, hide: true, interaction: interaction, delay: delay)
-        }
+        shared.resetType()
+        shared.setup(status: status, staticImage: image, hide: true, interaction: interaction, delay: delay, inView: inView)
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    class func showSuccess(_ status: String? = nil, image: UIImage? = nil, interaction: Bool = true, delay: TimeInterval? = nil) {
+    class func showSuccess(_ status: String? = nil, image: UIImage? = nil, interaction: Bool = true, delay: TimeInterval? = nil, inView: UIView? = nil) {
 
-        DispatchQueue.main.async {
-            shared.resetType()
-            shared.setup(status: status, staticImage: image ?? shared.imageSuccess, hide: true, interaction: interaction, delay: delay)
-        }
+        shared.resetType()
+        shared.setup(status: status, staticImage: image ?? shared.imageSuccess, hide: true, interaction: interaction, delay: delay, inView: inView)
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    class func showError(_ status: String? = nil, image: UIImage? = nil, interaction: Bool = true, delay: TimeInterval? = nil) {
+    class func showError(_ status: String? = nil, image: UIImage? = nil, interaction: Bool = true, delay: TimeInterval? = nil, inView: UIView? = nil) {
 
-        DispatchQueue.main.async {
-            shared.resetType()
-            shared.setup(status: status, staticImage: image ?? shared.imageError, hide: true, interaction: interaction, delay: delay)
-        }
+        shared.resetType()
+        shared.setup(status: status, staticImage: image ?? shared.imageError, hide: true, interaction: interaction, delay: delay, inView: inView)
     }
 
     // MARK: - Progress
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    class func showProgress(_ progress: CGFloat, interaction: Bool = false) {
+    class func showProgress(_ progress: CGFloat, interaction: Bool = false, inView: UIView? = nil) {
 
-        DispatchQueue.main.async {
-            shared.resetType()
-            shared.setup(progress: progress, hide: false, interaction: interaction)
-        }
+        shared.resetType()
+        shared.setup(progress: progress, hide: false, interaction: interaction, inView: inView)
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    class func showProgress(_ status: String?, _ progress: CGFloat, interaction: Bool = false) {
-
-        DispatchQueue.main.async {
-            shared.resetType()
-            shared.setup(status: status, progress: progress, hide: false, interaction: interaction)
-        }
+    class func showProgress(_ status: String?, _ progress: CGFloat, interaction: Bool = false, inView: UIView? = nil) {
+        
+        shared.resetType()
+        shared.setup(status: status, progress: progress, hide: false, interaction: interaction, inView: inView)
     }
 }
 
@@ -209,6 +187,7 @@ public extension RKHUD {
 //-----------------------------------------------------------------------------------------------------------------------------------------------
 public class RKHUD: UIView {
 
+    private var hudInView: UIView?
     private var viewBackground: UIView?
     private var toolbarHUD: UIToolbar?
     private var labelStatus: UILabel?
@@ -266,28 +245,31 @@ public class RKHUD: UIView {
 
     // MARK: -
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    private func setup(status: String? = nil, progress: CGFloat? = nil, animatedIcon: AnimatedIcon? = nil, staticImage: UIImage? = nil, hide: Bool, interaction: Bool, delay: TimeInterval? = nil) {
+    private func setup(status: String? = nil, progress: CGFloat? = nil, animatedIcon: AnimatedIcon? = nil, staticImage: UIImage? = nil, hide: Bool, interaction: Bool, delay: TimeInterval? = nil, inView: UIView? = nil) {
+        
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
+            self.hudInView = inView
+            self.setupNotifications()
+            self.setupBackground(interaction)
+            self.setupToolbar()
+            self.setupLabel(status)
 
-        setupNotifications()
-        setupBackground(interaction)
-        setupToolbar()
-        setupLabel(status)
+            if (progress == nil) && (animatedIcon == nil) && (staticImage == nil) { self.setupAnimation()                }
+            if (progress != nil) && (animatedIcon == nil) && (staticImage == nil) { self.setupProgress(progress)            }
+            if (progress == nil) && (animatedIcon != nil) && (staticImage == nil) { self.setupAnimatedIcon(animatedIcon)    }
+            if (progress == nil) && (animatedIcon == nil) && (staticImage != nil) { self.setupStaticImage(staticImage)    }
 
-        if (progress == nil) && (animatedIcon == nil) && (staticImage == nil) { setupAnimation()                }
-        if (progress != nil) && (animatedIcon == nil) && (staticImage == nil) { setupProgress(progress)            }
-        if (progress == nil) && (animatedIcon != nil) && (staticImage == nil) { setupAnimatedIcon(animatedIcon)    }
-        if (progress == nil) && (animatedIcon == nil) && (staticImage != nil) { setupStaticImage(staticImage)    }
+            self.setupSize()
+            self.setupPosition()
 
-        setupSize()
-        setupPosition()
+            self.displayHUD()
 
-        displayHUD()
-
-        if (hide) {
-            let text = labelStatus?.text ?? ""
-            let delay = delay ?? Double(text.count) * 0.03 + 1.25
-            timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
-                self.dismissHUD()
+            if (hide) {
+                let text = self.labelStatus?.text ?? ""
+                let delay = delay ?? Double(text.count) * 0.03 + 1.25
+                self.timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
+                    self.dismissHUD()
+                }
             }
         }
     }
@@ -314,7 +296,7 @@ public class RKHUD: UIView {
     private func setupBackground(_ interaction: Bool) {
 
         if (viewBackground == nil) {
-            let mainWindow = UIApplication.shared.keyWindow ?? UIApplication.shared.windows.first ?? UIWindow()
+            let mainWindow = hudInView ?? UIApplication.shared.keyWindow ?? UIApplication.shared.windows.first ?? UIWindow()
             viewBackground = UIView(frame: self.bounds)
             mainWindow.addSubview(viewBackground!)
         }
@@ -525,7 +507,7 @@ public class RKHUD: UIView {
             heightKeyboard = keyboardHeight()
         }
 
-        let mainWindow = UIApplication.shared.windows.first ?? UIWindow()
+        let mainWindow = hudInView ?? UIApplication.shared.keyWindow ?? UIApplication.shared.windows.first ?? UIWindow()
         let screen = mainWindow.bounds
         let center = CGPoint(x: screen.size.width/2, y: (screen.size.height-heightKeyboard)/2)
 

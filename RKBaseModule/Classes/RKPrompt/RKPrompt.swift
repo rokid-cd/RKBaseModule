@@ -9,7 +9,7 @@ import Foundation
 
 @objc public protocol RKPromptProtocol : NSObjectProtocol {
     
-    @objc func showToast(withText: String, inView: UIView?)
+    @objc func showToast(withText: String?, inView: UIView?)
     
     @objc func showLoading(inView: UIView?)
     
@@ -22,22 +22,22 @@ public class RKPrompt {
     
     public var promptDelegate: RKPromptProtocol?
     
-    public static func showToast(withText: String, inView: UIView?) {
+    public static func showToast(withText: String?, inView: UIView? = nil) {
         DispatchQueue.main.async {
-            share.promptDelegate?.showToast(withText: withText, inView: inView) ?? RKHUD.showToast(status: withText)
+            share.promptDelegate?.showToast(withText: withText, inView: inView) ?? RKHUD.showToast(withText: withText, inView: inView)
         }
         
     }
     
-    public static func showLoading(inView: UIView?) {
+    public static func showLoading(inView: UIView? = nil) {
         DispatchQueue.main.async {
-            share.promptDelegate?.showLoading(inView: inView) ?? RKHUD.show()
+            share.promptDelegate?.showLoading(inView: inView) ?? RKHUD.show(inView: inView)
         }
     }
     
-    public static func hidenLoading(inView: UIView?) {
+    public static func hidenLoading(inView: UIView? = nil) {
         DispatchQueue.main.async {
-            share.promptDelegate?.hidenLoading(inView: inView) ?? RKHUD.remove()
+            share.promptDelegate?.hidenLoading(inView: inView) ?? RKHUD.dismiss()
         }
     }
 }
