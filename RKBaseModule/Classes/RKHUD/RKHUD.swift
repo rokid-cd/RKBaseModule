@@ -105,8 +105,10 @@ public extension RKHUD {
     //-------------------------------------------------------------------------------------------------------------------------------------------
     class func showToast(withText: String?, interaction: Bool = true, inView: UIView? = nil) {
         guard let withText = withText else { return }
-        shared.animationType = .none
-        shared.setup(status: withText, hide: true, interaction: interaction, inView: inView)
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
+            shared.animationType = .none
+            shared.setup(status: withText, hide: true, interaction: interaction, inView: inView)
+        }
     }
     
     
@@ -247,29 +249,27 @@ public class RKHUD: UIView {
     //-------------------------------------------------------------------------------------------------------------------------------------------
     private func setup(status: String? = nil, progress: CGFloat? = nil, animatedIcon: AnimatedIcon? = nil, staticImage: UIImage? = nil, hide: Bool, interaction: Bool, delay: TimeInterval? = nil, inView: UIView? = nil) {
         
-        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
-            self.hudInView = inView
-            self.setupNotifications()
-            self.setupBackground(interaction)
-            self.setupToolbar()
-            self.setupLabel(status)
+        self.hudInView = inView
+        self.setupNotifications()
+        self.setupBackground(interaction)
+        self.setupToolbar()
+        self.setupLabel(status)
 
-            if (progress == nil) && (animatedIcon == nil) && (staticImage == nil) { self.setupAnimation()                }
-            if (progress != nil) && (animatedIcon == nil) && (staticImage == nil) { self.setupProgress(progress)            }
-            if (progress == nil) && (animatedIcon != nil) && (staticImage == nil) { self.setupAnimatedIcon(animatedIcon)    }
-            if (progress == nil) && (animatedIcon == nil) && (staticImage != nil) { self.setupStaticImage(staticImage)    }
+        if (progress == nil) && (animatedIcon == nil) && (staticImage == nil) { self.setupAnimation()                }
+        if (progress != nil) && (animatedIcon == nil) && (staticImage == nil) { self.setupProgress(progress)            }
+        if (progress == nil) && (animatedIcon != nil) && (staticImage == nil) { self.setupAnimatedIcon(animatedIcon)    }
+        if (progress == nil) && (animatedIcon == nil) && (staticImage != nil) { self.setupStaticImage(staticImage)    }
 
-            self.setupSize()
-            self.setupPosition()
+        self.setupSize()
+        self.setupPosition()
 
-            self.displayHUD()
+        self.displayHUD()
 
-            if (hide) {
-                let text = self.labelStatus?.text ?? ""
-                let delay = delay ?? Double(text.count) * 0.03 + 1.25
-                self.timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
-                    self.dismissHUD()
-                }
+        if (hide) {
+            let text = self.labelStatus?.text ?? ""
+            let delay = delay ?? Double(text.count) * 0.03 + 1.25
+            self.timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
+                self.dismissHUD()
             }
         }
     }
@@ -562,16 +562,14 @@ public class RKHUD: UIView {
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
     private func dismissHUD() {
-        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
-            if (self.alpha == 1) {
-                UIView.animate(withDuration: 0.15, delay: 0, options: [.allowUserInteraction, .curveEaseIn], animations: {
-                    self.toolbarHUD?.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
-                    self.toolbarHUD?.alpha = 0
-                }, completion: { isFinished in
-                    self.destroyHUD()
-                    self.alpha = 0
-                })
-            }
+        if (self.alpha == 1) {
+            UIView.animate(withDuration: 0.15, delay: 0, options: [.allowUserInteraction, .curveEaseIn], animations: {
+                self.toolbarHUD?.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
+                self.toolbarHUD?.alpha = 0
+            }, completion: { isFinished in
+                self.destroyHUD()
+                self.alpha = 0
+            })
         }
     }
 
