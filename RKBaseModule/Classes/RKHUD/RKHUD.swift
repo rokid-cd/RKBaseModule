@@ -562,15 +562,16 @@ public class RKHUD: UIView {
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
     private func dismissHUD() {
-
-        if (self.alpha == 1) {
-            UIView.animate(withDuration: 0.15, delay: 0, options: [.allowUserInteraction, .curveEaseIn], animations: {
-                self.toolbarHUD?.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
-                self.toolbarHUD?.alpha = 0
-            }, completion: { isFinished in
-                self.destroyHUD()
-                self.alpha = 0
-            })
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
+            if (self.alpha == 1) {
+                UIView.animate(withDuration: 0.15, delay: 0, options: [.allowUserInteraction, .curveEaseIn], animations: {
+                    self.toolbarHUD?.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
+                    self.toolbarHUD?.alpha = 0
+                }, completion: { isFinished in
+                    self.destroyHUD()
+                    self.alpha = 0
+                })
+            }
         }
     }
 
