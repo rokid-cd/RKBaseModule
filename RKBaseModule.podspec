@@ -28,7 +28,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/刘爽/RKBaseModule.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.static_framework = true
+  s.static_framework = false
   
   s.swift_version = '5.0'
 
@@ -37,13 +37,14 @@ TODO: Add long description of the pod here.
   s.default_subspec = 'RKPrompt'
       
   s.subspec 'RKFilePreview' do |ss|
+    ss.frameworks   = 'VideoToolbox'
+    ss.ios.library = 'z', 'iconv', 'c++', 'bz2'
+    ss.vendored_frameworks = 'RKBaseModule/Classes/Frameworks/*.framework'
     ss.resources    = 'RKBaseModule/Assets/RKBaseModule.bundle'
     ss.source_files = 'RKBaseModule/Classes/RKFilePreview/**/*'
     
     ss.dependency 'RKBaseModule/RKPrompt'
     ss.dependency 'RKBaseModule/RKExtention'
-    
-    ss.dependency 'KSYMediaPlayer_iOS/KSYMediaPlayer_vod', '~> 3.0.3'
     ss.dependency 'SnapKit'
     ss.dependency 'Kingfisher'
   end
