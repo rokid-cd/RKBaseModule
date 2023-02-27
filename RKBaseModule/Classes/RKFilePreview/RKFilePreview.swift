@@ -104,17 +104,11 @@ public class RKFilePreview {
     
     // 获取视频文件缩略图
     public static func videoThumbnailImage(fileUrl: URL, complete: @escaping ThumbnailClosure) {
-        
-        KingfisherManager.shared.cache.retrieveImage(forKey: fileUrl.absoluteString) { result in
-            switch result {
-            case .failure(_):
+        KingfisherManager.shared.cache.retrieveImage(forKey: fileUrl.absoluteString, options: nil) { image, type in
+            if let image = image {
+                complete(image, fileUrl)
+            } else {
                 fetchVideoThumbnailImage(fileUrl: fileUrl, complete: complete)
-            case let .success(data):
-                if data.cacheType != .none, let image = data.image {
-                    complete(image, fileUrl)
-                } else {
-                    fetchVideoThumbnailImage(fileUrl: fileUrl, complete: complete)
-                }
             }
         }
     }

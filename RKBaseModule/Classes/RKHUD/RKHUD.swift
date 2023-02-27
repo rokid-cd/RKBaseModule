@@ -268,9 +268,7 @@ public class RKHUD: UIView {
         if (hide) {
             let text = self.labelStatus?.text ?? ""
             let delay = delay ?? Double(text.count) * 0.03 + 1.25
-            self.timer = Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
-                self.dismissHUD()
-            }
+            self.timer = Timer.scheduledTimer(timeInterval: delay, target: self, selector: #selector(dismissHUD), userInfo: nil, repeats: false)
         }
     }
     
@@ -561,7 +559,7 @@ public class RKHUD: UIView {
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
-    private func dismissHUD() {
+    @objc private func dismissHUD() {
         if (self.alpha == 1) {
             UIView.animate(withDuration: 0.15, delay: 0, options: [.allowUserInteraction, .curveEaseIn], animations: {
                 self.toolbarHUD?.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)

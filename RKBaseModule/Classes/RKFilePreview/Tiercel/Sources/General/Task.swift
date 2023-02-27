@@ -34,7 +34,7 @@ extension Task {
     }
 }
 
-public class Task<TaskType>: NSObject, Codable {
+public class Task<TaskType>: NSObject, NSCoding, Codable {
     
     private enum CodingKeys: CodingKey {
         case url
@@ -49,185 +49,168 @@ public class Task<TaskType>: NSObject, Codable {
         case status
         case verificationType
         case validation
-        case error
-    }
-    
-    enum CompletionType {
-        case local
-        case network(task: URLSessionTask, error: Error?)
-    }
-    
-    enum InterruptType {
-        case manual(_ fromRunningTask: Bool)
-        case error(_ error: Error)
-        case statusCode(_ statusCode: Int)
     }
 
-    public internal(set) weak var manager: SessionManager?
+    internal weak var manager: SessionManager?
 
     internal var cache: Cache
 
     internal var operationQueue: DispatchQueue
 
-    public let url: URL
+    internal var session: URLSession?
     
-    public let progress: Progress = Progress()
+    internal var headers: [String: String]?
 
-    internal struct State {
-        var session: URLSession?
-        var headers: [String: String]?
-        var verificationCode: String?
-        var verificationType: FileChecksumHelper.VerificationType = .md5
-        var isRemoveCompletely: Bool = false
-        var status: Status = .waiting
-        var validation: Validation = .unkown
-        var currentURL: URL
-        var startDate: Double = 0
-        var endDate: Double = 0
-        var speed: Int64 = 0
-        var fileName: String
-        var timeRemaining: Int64 = 0
-        var error: Error?
+    internal var verificationCode: String?
+    
+    internal var verificationType: FileVerificationType = .md5
+    
+    internal var progressExecuter: Executer<TaskType>?
+    
+    internal var successExecuter: Executer<TaskType>?
+    
+    internal var failureExecuter: Executer<TaskType>?
+    
+    internal var controlExecuter: Executer<TaskType>?
 
-        var progressExecuter: Executer<TaskType>?
-        var successExecuter: Executer<TaskType>?
-        var failureExecuter: Executer<TaskType>?
-        var controlExecuter: Executer<TaskType>?
-        var completionExecuter: Executer<TaskType>?
-        var validateExecuter: Executer<TaskType>?
-    }
+    internal var validateExecuter: Executer<TaskType>?
+
+    internal let dataQueue = DispatchQueue(label: "com.Tiercel.Task.dataQueue")
     
-    
-    internal let protectedState: Protected<State>
-    
-    internal var session: URLSession? {
-        get { protectedState.wrappedValue.session }
-        set { protectedState.write { $0.session = newValue } }
-    }
-    
-    internal var headers: [String: String]? {
-        get { protectedState.wrappedValue.headers }
-        set { protectedState.write { $0.headers = newValue } }
-    }
-    
-    internal var verificationCode: String? {
-        get { protectedState.wrappedValue.verificationCode }
-        set { protectedState.write { $0.verificationCode = newValue } }
-    }
-    
-    internal var verificationType: FileChecksumHelper.VerificationType {
-        get { protectedState.wrappedValue.verificationType }
-        set { protectedState.write { $0.verificationType = newValue } }
-    }
-    
+    private var _isRemoveCompletely = false
     internal var isRemoveCompletely: Bool {
-        get { protectedState.wrappedValue.isRemoveCompletely }
-        set { protectedState.write { $0.isRemoveCompletely = newValue } }
+        get {
+            return dataQueue.sync {
+                _isRemoveCompletely
+            }
+        }
+        set {
+            dataQueue.sync {
+                _isRemoveCompletely = newValue
+            }
+        }
     }
 
-    public internal(set) var status: Status {
-        get { protectedState.wrappedValue.status }
-        set {
-            protectedState.write { $0.status = newValue }
-            if newValue == .willSuspend || newValue == .willCancel || newValue == .willRemove {
-                return
+    private var _status: Status = .waiting
+    public var status: Status {
+        get {
+            return dataQueue.sync {
+                _status
             }
-            if self is DownloadTask {
-                manager?.log(.downloadTask(newValue.rawValue, task: self as! DownloadTask))
+        }
+        set {
+            dataQueue.sync {
+                _status = newValue
             }
         }
     }
     
-    public internal(set) var validation: Validation {
-        get { protectedState.wrappedValue.validation }
-        set { protectedState.write { $0.validation = newValue } }
+    private var _validation: Validation = .unkown
+    public var validation: Validation {
+        get {
+            return dataQueue.sync {
+                _validation
+            }
+        }
+        set {
+            dataQueue.sync {
+                _validation = newValue
+            }
+        }
     }
+
+    public let url: URL
     
+    private var _currentURL: URL
     internal var currentURL: URL {
-        get { protectedState.wrappedValue.currentURL }
-        set { protectedState.write { $0.currentURL = newValue } }
+        get {
+            return dataQueue.sync {
+                _currentURL
+            }
+        }
+        set {
+            dataQueue.sync {
+                _currentURL = newValue
+            }
+        }
     }
+    
 
+    public let progress: Progress = Progress()
 
+    private var _startDate: Double = 0
     public internal(set) var startDate: Double {
-        get { protectedState.wrappedValue.startDate }
-        set { protectedState.write { $0.startDate = newValue } }
-    }
-    
-    public var startDateString: String {
-        startDate.tr.convertTimeToDateString()
+        get {
+            return dataQueue.sync {
+                _startDate
+            }
+        }
+        set {
+            dataQueue.sync {
+                _startDate = newValue
+            }
+        }
     }
 
+    private var _endDate: Double = 0
     public internal(set) var endDate: Double {
-       get { protectedState.wrappedValue.endDate }
-       set { protectedState.write { $0.endDate = newValue } }
-    }
-    
-    public var endDateString: String {
-        endDate.tr.convertTimeToDateString()
+        get {
+            return dataQueue.sync {
+                _endDate
+            }
+        }
+        set {
+            return dataQueue.sync {
+                _endDate = newValue
+            }
+        }
     }
 
 
+    private var _speed: Int64 = 0
     public internal(set) var speed: Int64 {
-        get { protectedState.wrappedValue.speed }
-        set { protectedState.write { $0.speed = newValue } }
-    }
-    
-    public var speedString: String {
-        speed.tr.convertSpeedToString()
+        get {
+            return dataQueue.sync {
+                _speed
+            }
+        }
+        set {
+            dataQueue.sync {
+                _speed = newValue
+            }
+        }
     }
 
     /// 默认为url的md5加上文件扩展名
+    private var _fileName: String
     public internal(set) var fileName: String {
-        get { protectedState.wrappedValue.fileName }
-        set { protectedState.write { $0.fileName = newValue } }
+        get {
+            return dataQueue.sync {
+                _fileName
+            }
+        }
+        set {
+            dataQueue.sync {
+                _fileName = newValue
+            }
+        }
     }
 
+    private var _timeRemaining: Int64 = 0
     public internal(set) var timeRemaining: Int64 {
-        get { protectedState.wrappedValue.timeRemaining }
-        set { protectedState.write { $0.timeRemaining = newValue } }
-    }
-    
-    public var timeRemainingString: String {
-        timeRemaining.tr.convertTimeToString()
-    }
-
-    public internal(set) var error: Error? {
-        get { protectedState.wrappedValue.error }
-        set { protectedState.write { $0.error = newValue } }
-    }
-
-
-    internal var progressExecuter: Executer<TaskType>? {
-        get { protectedState.wrappedValue.progressExecuter }
-        set { protectedState.write { $0.progressExecuter = newValue } }
+        get {
+            return dataQueue.sync {
+                _timeRemaining
+            }
+        }
+        set {
+            dataQueue.sync {
+                _timeRemaining = newValue
+            }
+        }
     }
 
-    internal var successExecuter: Executer<TaskType>? {
-        get { protectedState.wrappedValue.successExecuter }
-        set { protectedState.write { $0.successExecuter = newValue } }
-    }
-
-    internal var failureExecuter: Executer<TaskType>? {
-        get { protectedState.wrappedValue.failureExecuter }
-        set { protectedState.write { $0.failureExecuter = newValue } }
-    }
-
-    internal var completionExecuter: Executer<TaskType>? {
-        get { protectedState.wrappedValue.completionExecuter }
-        set { protectedState.write { $0.completionExecuter = newValue } }
-    }
-    
-    internal var controlExecuter: Executer<TaskType>? {
-        get { protectedState.wrappedValue.controlExecuter }
-        set { protectedState.write { $0.controlExecuter = newValue } }
-    }
-
-    internal var validateExecuter: Executer<TaskType>? {
-        get { protectedState.wrappedValue.validateExecuter }
-        set { protectedState.write { $0.validateExecuter = newValue } }
-    }
-
+    public internal(set) var error: Error?
 
 
     internal init(_ url: URL,
@@ -237,7 +220,8 @@ public class Task<TaskType>: NSObject, Codable {
         self.cache = cache
         self.url = url
         self.operationQueue = operationQueue
-        protectedState = Protected(State(currentURL: url, fileName: url.tr.fileName))
+        _currentURL = url
+        _fileName = url.tr.fileName
         super.init()
         self.headers = headers
     }
@@ -256,52 +240,80 @@ public class Task<TaskType>: NSObject, Codable {
         try container.encodeIfPresent(verificationCode, forKey: .verificationCode)
         try container.encode(verificationType.rawValue, forKey: .verificationType)
         try container.encode(validation.rawValue, forKey: .validation)
-        if let error = error {
-            let errorData: Data
-            if #available(iOS 11.0, *) {
-                errorData = try NSKeyedArchiver.archivedData(withRootObject: (error as NSError), requiringSecureCoding: true)
-            } else {
-                errorData = NSKeyedArchiver.archivedData(withRootObject: (error as NSError))
-            }
-            try container.encode(errorData, forKey: .error)
-        }
+        
     }
     
     public required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         url = try container.decode(URL.self, forKey: .url)
-        let currentURL = try container.decode(URL.self, forKey: .currentURL)
-        let fileName = try container.decode(String.self, forKey: .fileName)
-        protectedState = Protected(State(currentURL: currentURL, fileName: fileName))
+        _currentURL = try container.decode(URL.self, forKey: .currentURL)
+        _fileName = try container.decode(String.self, forKey: .fileName)
         cache = decoder.userInfo[.cache] as? Cache ?? Cache("default")
         operationQueue = decoder.userInfo[.operationQueue] as? DispatchQueue ?? DispatchQueue(label: "com.Tiercel.SessionManager.operationQueue")
         super.init()
 
+        headers = try container.decodeIfPresent([String: String].self, forKey: .headers)
+        startDate = try container.decode(Double.self, forKey: .startDate)
+        endDate = try container.decode(Double.self, forKey: .endDate)
         progress.totalUnitCount = try container.decode(Int64.self, forKey: .totalBytes)
         progress.completedUnitCount = try container.decode(Int64.self, forKey: .completedBytes)
+        verificationCode = try container.decodeIfPresent(String.self, forKey: .verificationCode)
         
         let statusString = try container.decode(String.self, forKey: .status)
+        status = Status(rawValue: statusString)!
         let verificationTypeInt = try container.decode(Int.self, forKey: .verificationType)
-        let validationType = try container.decode(Int.self, forKey: .validation)
+        verificationType = FileVerificationType(rawValue: verificationTypeInt)!
         
-        try protectedState.write {
-            $0.headers = try container.decodeIfPresent([String: String].self, forKey: .headers)
-            $0.startDate = try container.decode(Double.self, forKey: .startDate)
-            $0.endDate = try container.decode(Double.self, forKey: .endDate)
-            $0.verificationCode = try container.decodeIfPresent(String.self, forKey: .verificationCode)
-            $0.status = Status(rawValue: statusString)!
-            $0.verificationType = FileChecksumHelper.VerificationType(rawValue: verificationTypeInt)!
-            $0.validation = Validation(rawValue: validationType)!
-            if let errorData = try container.decodeIfPresent(Data.self, forKey: .error) {
-                if #available(iOS 11.0, *) {
-                    $0.error = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSError.self, from: errorData)
-                } else {
-                    $0.error = NSKeyedUnarchiver.unarchiveObject(with: errorData) as? NSError
-                }
-            }
-        }
+        let validationType = try container.decode(Int.self, forKey: .validation)
+        validation = Validation(rawValue: validationType)!
+
+    }
+    
+    @available(*, deprecated, message: "Use encode(to:) instead.")
+    public func encode(with aCoder: NSCoder) {
+        aCoder.encode(url.absoluteString, forKey: "url")
+        aCoder.encode(currentURL.absoluteString, forKey: "currentURL")
+        aCoder.encode(fileName, forKey: "fileName")
+        aCoder.encode(headers, forKey: "headers")
+        aCoder.encode(startDate, forKey: "startDate")
+        aCoder.encode(endDate, forKey: "endDate")
+        aCoder.encode(progress.totalUnitCount, forKey: "totalBytes")
+        aCoder.encode(progress.completedUnitCount, forKey: "completedBytes")
+        aCoder.encode(status.rawValue, forKey: "status")
+        aCoder.encode(verificationCode, forKey: "verificationCode")
+        aCoder.encode(verificationType.rawValue, forKey: "verificationType")
+        aCoder.encode(validation.rawValue, forKey: "validation")
+    }
+    
+    @available(*, deprecated, message: "Use init(from:) instead.")
+    public required init?(coder aDecoder: NSCoder) {
+        cache = Cache("default")
+        let URLString = aDecoder.decodeObject(forKey: "URLString") as! String
+        url = try! URLString.asURL()
+        let currentURLSting = aDecoder.decodeObject(forKey: "currentURLString") as! String
+        _currentURL = try! currentURLSting.asURL()
+        _fileName = aDecoder.decodeObject(forKey: "fileName") as! String
+        operationQueue = DispatchQueue(label: "com.Tiercel.SessionManager.operationQueue")
+        super.init()
+
+        headers = aDecoder.decodeObject(forKey: "headers") as? [String: String]
+        startDate = aDecoder.decodeDouble(forKey: "startDate")
+        endDate = aDecoder.decodeDouble(forKey: "endDate")
+        progress.totalUnitCount = aDecoder.decodeInt64(forKey: "totalBytes")
+        progress.completedUnitCount = aDecoder.decodeInt64(forKey: "completedBytes")
+        verificationCode = aDecoder.decodeObject(forKey: "verificationCode") as? String
+
+        let statusString = aDecoder.decodeObject(forKey: "status") as! String
+        status = Status(rawValue: statusString)!
+        let verificationTypeInt = aDecoder.decodeInteger(forKey: "verificationType")
+        verificationType = FileVerificationType(rawValue: verificationTypeInt)!
+
+        let validationType = aDecoder.decodeInteger(forKey: "validation")
+        validation = Validation(rawValue: validationType)!
     }
 
+
+    
     internal func execute(_ Executer: Executer<TaskType>?) {
         
     }
@@ -311,16 +323,21 @@ public class Task<TaskType>: NSObject, Codable {
 
 extension Task {
     @discardableResult
-    public func progress(onMainQueue: Bool = true, handler: @escaping Handler<TaskType>) -> Self {
-        progressExecuter = Executer(onMainQueue: onMainQueue, handler: handler)
-        return self
+    public func progress(onMainQueue: Bool = true, _ handler: @escaping Handler<TaskType>) -> Self {
+        return operationQueue.sync {
+            progressExecuter = Executer(onMainQueue: onMainQueue, handler: handler)
+            return self
+        }
+
     }
 
     @discardableResult
-    public func success(onMainQueue: Bool = true, handler: @escaping Handler<TaskType>) -> Self {
-        successExecuter = Executer(onMainQueue: onMainQueue, handler: handler)
-        if status == .succeeded  && completionExecuter == nil{
-            operationQueue.async {
+    public func success(onMainQueue: Bool = true, _ handler: @escaping Handler<TaskType>) -> Self {
+        operationQueue.sync {
+            successExecuter = Executer(onMainQueue: onMainQueue, handler: handler)
+        }
+        operationQueue.async {
+            if self.status == .succeeded {
                 self.execute(self.successExecuter)
             }
         }
@@ -329,35 +346,20 @@ extension Task {
     }
 
     @discardableResult
-    public func failure(onMainQueue: Bool = true, handler: @escaping Handler<TaskType>) -> Self {
-        failureExecuter = Executer(onMainQueue: onMainQueue, handler: handler)
-        if completionExecuter == nil &&
-            (status == .suspended ||
-            status == .canceled ||
-            status == .removed ||
-            status == .failed) {
-            operationQueue.async {
+    public func failure(onMainQueue: Bool = true, _ handler: @escaping Handler<TaskType>) -> Self {
+        operationQueue.sync {
+            failureExecuter = Executer(onMainQueue: onMainQueue, handler: handler)
+        }
+        operationQueue.async {
+            if self.status == .suspended ||
+                self.status == .canceled ||
+                self.status == .removed ||
+                self.status == .failed  {
                 self.execute(self.failureExecuter)
             }
         }
         return self
     }
-    
-    @discardableResult
-    public func completion(onMainQueue: Bool = true, handler: @escaping Handler<TaskType>) -> Self {
-        completionExecuter = Executer(onMainQueue: onMainQueue, handler: handler)
-        if status == .suspended ||
-            status == .canceled ||
-            status == .removed ||
-            status == .succeeded ||
-            status == .failed  {
-            operationQueue.async {
-                self.execute(self.completionExecuter)
-            }
-        }
-        return self
-    }
-    
 }
 
 

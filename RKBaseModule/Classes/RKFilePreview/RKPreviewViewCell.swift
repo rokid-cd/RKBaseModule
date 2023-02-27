@@ -522,14 +522,9 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
                  if totalSize > 0 {
                      self.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
                  }
-             } completionHandler: {[weak self] result in
+             } completionHandler: {[weak self] image, error, type, url in
                  guard let self = self else { return }
-                 switch result {
-                 case .failure(_):
-                     self.progressView.progress = 0
-                 case .success(_):
-                     self.progressView.progress = 1.0
-                 }
+                 self.progressView.progress = image != nil ? 1.0 : 0
              }
     }
     

@@ -15,9 +15,7 @@ public class RKDownloadManager: NSObject {
     static var sessionManager: SessionManager = {
         var configuration = SessionConfiguration()
         configuration.allowsCellularAccess = true
-        let path = Cache.defaultDiskCachePathClosure("com.rokid.Cache")
-        let cacahe = Cache("File", downloadPath: path)
-        let manager = SessionManager("File", configuration: configuration, cache: cacahe, operationQueue: DispatchQueue(label: "com.rokid.SessionManager.operationQueue"))
+        let manager = SessionManager("Rokid", configuration: configuration, operationQueue: DispatchQueue(label: "com.rokid.SessionManager.operationQueue"))
         return manager
     }()
     
@@ -31,17 +29,16 @@ public class RKDownloadManager: NSObject {
     }
     
     public static func downLoadFile(fileUrl: URL, progress: ProgressClosure? = nil, completion: CompletionClosure? = nil) {
-        sessionManager.download(fileUrl)?.progress { (task) in
+        sessionManager.download(fileUrl)?.progress { task in
             progress?(task.progress)
             
-        }.completion { (task) in
-            if task.status == .succeeded {
-                completion?(nil, task.filePath)
-                
-            } else if task.status == .failed {
+        }.success({ task in
+            completion?(nil, task.filePath)
+        }).failure({ task in
+            if task.status == .failed {
                 completion?(task.error, "")
             }
-        }
+        })
     }
     
     public static func suspend(fileUrl: URL) {
