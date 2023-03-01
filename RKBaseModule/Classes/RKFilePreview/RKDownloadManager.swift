@@ -29,7 +29,7 @@ public class RKDownloadManager: NSObject {
     }
     
     public static func isDownloading(fileUrl: URL) -> Bool {
-        guard let task = sessionManager.fetchTask(url) else { return false }
+        guard let task = sessionManager.fetchTask(fileUrl) else { return false }
         return task.status == .running
     }    
     
