@@ -37,11 +37,6 @@ public class RKFilePreview {
     public static func previewFile(fileModels: [RKFileModel], index: Int, push: Bool = false) {
         guard fileModels.count > 0, let vc = UIApplication.topViewController() else { return }
         
-        let session = AVAudioSession.sharedInstance()
-        try? session.session.setActive(false)
-        try? session.session.setCategory(AVAudioSession.Category.soloAmbient, mode: AVAudioSession.Mode.default, options: AVAudioSession.CategoryOptions.allowBluetooth)
-        try? session.session.setActive(true, options: AVAudioSession.SetActiveOptions.notifyOthersOnDeactivation)
-        
         let browser = JXPhotoBrowser()
         browser.numberOfItems = { fileModels.count }
         browser.cellClassAtIndex = { index in
