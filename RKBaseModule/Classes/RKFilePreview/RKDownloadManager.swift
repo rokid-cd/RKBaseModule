@@ -28,6 +28,11 @@ public class RKDownloadManager: NSObject {
         return FileManager.default.fileExists(atPath: cachePath)
     }
     
+    public static func isDownloading(fileUrl: URL) -> Bool {
+        guard let task = sessionManager.fetchTask(url) else { return false }
+        return task.status == .running
+    }    
+    
     public static func downLoadFile(fileUrl: URL, progress: ProgressClosure? = nil, completion: CompletionClosure? = nil) {
         sessionManager.download(fileUrl)?.progress { task in
             progress?(task.progress)
