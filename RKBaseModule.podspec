@@ -44,6 +44,7 @@ TODO: Add long description of the pod here.
     ss.source_files = 'RKBaseModule/Classes/RKFilePreview/**/*'
     
     ss.dependency 'RKBaseModule/RKPrompt'
+    ss.dependency 'RKBaseModule/RKDownload'
     ss.dependency 'RKBaseModule/RKExtention'
     ss.dependency 'SnapKit'
     ss.dependency 'Kingfisher'
@@ -53,17 +54,21 @@ TODO: Add long description of the pod here.
     ss.source_files = 'RKBaseModule/Classes/RKHUD/**/*'
   end
   
-  s.subspec 'RKExtention' do |ss|
-    ss.source_files = 'RKBaseModule/Classes/RKExtention/**/*'
-  end
-  
   s.subspec 'RKPrompt' do |ss|
     ss.source_files = 'RKBaseModule/Classes/RKPrompt/**/*'
     ss.dependency 'RKBaseModule/RKHUD'
   end
   
+  s.subspec 'RKExtention' do |ss|
+    ss.source_files = 'RKBaseModule/Classes/RKExtention/**/*'
+  end
+  
   s.subspec 'RKTransitioning' do |ss|
     ss.source_files = 'RKBaseModule/Classes/RKTransitioning/**/*'
+  end
+  
+  s.subspec 'RKDownload' do |ss|
+    ss.source_files = 'RKBaseModule/Classes/RKDownload/**/*'
   end
   
   s.subspec 'RKReplayKit' do |ss|

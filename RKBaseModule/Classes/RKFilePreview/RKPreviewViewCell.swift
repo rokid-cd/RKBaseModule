@@ -502,8 +502,7 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
         
         imageModel = model
         
-        RKDownloadManager.trustHost(fileUrl: model.fileUrl)
-        
+        RKFilePreview.trustHost(fileUrl: model.fileUrl)
         imageView.kf.setImage(with: model.thumbUrl)
         
         if let fileSize = model.size, Double(fileSize) ?? 0 > 0 {

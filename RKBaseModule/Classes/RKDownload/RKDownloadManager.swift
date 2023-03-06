@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Kingfisher
 
 public class RKDownloadManager: NSObject {
     public typealias CompletionClosure = ((Error?, String) -> Void)
@@ -60,18 +59,6 @@ public class RKDownloadManager: NSObject {
     public static func cancel(fileUrl: URL) {
         sessionManager.cancel(fileUrl)
     }    
-    
-    public static func trustHost(fileUrl: URL?) {
-        guard let url = fileUrl else { return }
-        if var trustedHosts = ImageDownloader.default.trustedHosts {
-            trustedHosts.insert(url.host ?? "")
-            ImageDownloader.default.trustedHosts = trustedHosts
-        } else {
-            let trustedHosts: Set<String> = [url.host ?? ""]
-            ImageDownloader.default.trustedHosts = trustedHosts
-        }
-    }
-    
 }
 
 extension SessionDelegate {

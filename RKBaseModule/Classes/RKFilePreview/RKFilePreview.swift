@@ -104,7 +104,7 @@ public class RKFilePreview {
     
     // 获取视频文件缩略图
     public static func videoThumbnailImage(fileUrl: URL, complete: @escaping ThumbnailClosure) {
-        
+        RKFilePreview.trustHost(fileUrl: fileUrl)
         KingfisherManager.shared.cache.retrieveImage(forKey: fileUrl.absoluteString) { result in
             switch result {
             case .failure(_):
@@ -131,6 +131,17 @@ public class RKFilePreview {
             }
         }
     }
+    
+    public static func trustHost(fileUrl: URL?) {
+        guard let url = fileUrl else { return }
+        if var trustedHosts = ImageDownloader.default.trustedHosts {
+            trustedHosts.insert(url.host ?? "")
+            ImageDownloader.default.trustedHosts = trustedHosts
+        } else {
+            let trustedHosts: Set<String> = [url.host ?? ""]
+            ImageDownloader.default.trustedHosts = trustedHosts
+        }
+    }
 }
 
 
@@ -142,7 +153,6 @@ public extension UIImageView {
             return
         }
         tag = fileUrl.hashValue
-        RKDownloadManager.trustHost(fileUrl: fileUrl)
         RKFilePreview.videoThumbnailImage(fileUrl: fileUrl) { image, url in
             if self.tag == url.hashValue {
                 completeClosure?(image)
@@ -161,7 +171,6 @@ public extension UIButton {
             return
         }
         tag = fileUrl.hashValue
-        RKDownloadManager.trustHost(fileUrl: fileUrl)
         RKFilePreview.videoThumbnailImage(fileUrl: fileUrl) { image, url in
             if self.tag == fileUrl.hashValue {
                 completeClosure?(image)
