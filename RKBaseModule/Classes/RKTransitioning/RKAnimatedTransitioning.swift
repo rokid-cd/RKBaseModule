@@ -26,10 +26,20 @@ extension RKAnimatedTransitioning: UIViewControllerAnimatedTransitioning {
         let toView = toVC?.view
         guard let fromView = fromView, let toView = toView else { return }
         let containerView = transitionContext.containerView
+        let bgView = containerView.viewWithTag(1001) ?? UIView()
+        
+        let ScreenWidth  = min(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)
+        let ScreenHeight = max(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)
+        
         if isPresenting {
-            toView.frame = CGRect(x: 0, y: UI.ScreenHeight, width: UI.ScreenWidth, height: UI.ScreenHeight - 56)
+            bgView.tag = 1001
+            bgView.backgroundColor = .clear
+            bgView.frame = containerView.bounds
+            containerView.addSubview(bgView)
+
+            toView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: ScreenHeight - 56)
             containerView.addSubview(toView)
-            toView.layer.cornerRadius = 10
+            
             let maskPath = UIBezierPath(roundedRect: toView.bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: 10, height: 10))
             let maskLayer = CAShapeLayer()
             maskLayer.frame = toView.bounds
@@ -38,11 +48,11 @@ extension RKAnimatedTransitioning: UIViewControllerAnimatedTransitioning {
         }
         UIView.animate(withDuration: duration, animations: {
             if self.isPresenting {
-                containerView.backgroundColor = UIColor(hexInt: 0x777D89, alpha: 0.6)
-                toView.frame = CGRect(x: 0, y: 56, width: UI.ScreenWidth, height: UI.ScreenHeight - 56)
+                bgView.backgroundColor = UIColor(hex: 0x777D89).withAlphaComponent(0.6)
+                toView.frame = CGRect(x: 0, y: 56, width: ScreenWidth, height: ScreenHeight - 56)
             } else {
-                fromView.frame = CGRect(x: 0, y: UI.ScreenHeight, width: UI.ScreenWidth, height: UI.ScreenHeight)
-                containerView.backgroundColor = .clear
+                bgView.backgroundColor = .clear
+                fromView.frame = CGRect(x: 0, y: ScreenHeight, width: ScreenWidth, height: ScreenHeight)
             }
          }) { (finished) in
              if !self.isPresenting {
