@@ -7,14 +7,14 @@
 
 import UIKit
 
-class RKTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+public class RKTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
+    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         let at = RKAnimatedTransitioning()
         at.isPresenting = true
         return at
     }
     
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         let at = RKAnimatedTransitioning()
         at.isPresenting = false
         return at
