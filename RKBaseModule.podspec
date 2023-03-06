@@ -34,7 +34,7 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '11.0'
   
-  s.default_subspec = 'RKPrompt'
+#  s.default_subspec = 'RKPrompt'
       
   s.subspec 'RKFilePreview' do |ss|
     ss.frameworks   = 'VideoToolbox'
@@ -60,6 +60,10 @@ TODO: Add long description of the pod here.
   s.subspec 'RKPrompt' do |ss|
     ss.source_files = 'RKBaseModule/Classes/RKPrompt/**/*'
     ss.dependency 'RKBaseModule/RKHUD'
+  end
+  
+  s.subspec 'RKTransitioning' do |ss|
+    ss.source_files = 'RKBaseModule/Classes/RKTransitioning/**/*'
   end
   
   s.subspec 'RKReplayKit' do |ss|

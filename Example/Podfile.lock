@@ -1,5 +1,12 @@
 PODS:
   - Kingfisher (6.3.1)
+  - RKBaseModule (0.1.0):
+    - RKBaseModule/RKExtention (= 0.1.0)
+    - RKBaseModule/RKFilePreview (= 0.1.0)
+    - RKBaseModule/RKHUD (= 0.1.0)
+    - RKBaseModule/RKPrompt (= 0.1.0)
+    - RKBaseModule/RKReplayKit (= 0.1.0)
+    - RKBaseModule/RKTransitioning (= 0.1.0)
   - RKBaseModule/RKExtention (0.1.0)
   - RKBaseModule/RKFilePreview (0.1.0):
     - Kingfisher
@@ -9,10 +16,12 @@ PODS:
   - RKBaseModule/RKHUD (0.1.0)
   - RKBaseModule/RKPrompt (0.1.0):
     - RKBaseModule/RKHUD
+  - RKBaseModule/RKReplayKit (0.1.0)
+  - RKBaseModule/RKTransitioning (0.1.0)
   - SnapKit (5.6.0)
 
 DEPENDENCIES:
-  - RKBaseModule/RKFilePreview (from `../`)
+  - RKBaseModule (from `../`)
 
 SPEC REPOS:
   trunk:
@@ -25,9 +34,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Kingfisher: 016c8b653a35add51dd34a3aba36b580041acc74
-  RKBaseModule: 64db067c05fd2494cc421a1c6dbf94a6513180ad
+  RKBaseModule: 8814250232ce9e7ff13cf20ff717590f2098c57c
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
 
-PODFILE CHECKSUM: 01c957401e6e37beb221ae711912b4b23a5192ef
+PODFILE CHECKSUM: 02fd7ecd61608a234ffa0f790c8d6334d118678a
 
 COCOAPODS: 1.11.3
