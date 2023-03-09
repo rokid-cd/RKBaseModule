@@ -11,7 +11,7 @@ import QuickLook
 
 class RKDocumentPreviewVC: UIViewController {
     
-    var fileUrl: URL?
+    var fileModel: RKFileModel?
     
     private var loacalFileURL: URL?
     
@@ -196,9 +196,9 @@ class RKDocumentPreviewVC: UIViewController {
     
     func loadData() {
         
-        guard let fileUrl = fileUrl else { return }
+        guard let fileModel = fileModel, let fileUrl = fileModel.fileUrl else { return }
         
-        title = fileUrl.lastPathComponent
+        title = fileModel.fileName ?? fileUrl.lastPathComponent
         let extensionName = fileUrl.pathExtension
         let fileType = RKDocumentFileType(rawValue: extensionName) ?? .other
         imageView.image = fileType.image
@@ -262,11 +262,11 @@ class RKDocumentPreviewVC: UIViewController {
             vc.presentOptionsMenu(from: actionButton.frame, in: self.view, animated: true)
             
         case .download:
-            guard let fileUrl = fileUrl else { return }
+            guard let fileModel = fileModel, let fileUrl = fileModel.fileUrl else { return }
             RKDownloadManager.resume(fileUrl: fileUrl)
             actionState = .pause
         case .pause:
-            guard let fileUrl = fileUrl else { return }
+            guard let fileModel = fileModel, let fileUrl = fileModel.fileUrl else { return }
             RKDownloadManager.suspend(fileUrl: fileUrl)
             actionState = .download
         case .fail:

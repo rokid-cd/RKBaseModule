@@ -20,16 +20,18 @@ import Kingfisher
     public var thumbUrl: URL?
     public var size: String?
     public var duration: String?
+    public var fileName: String?
     public var fileType: RKFileType?
+    
 }
 
 public class RKFilePreview {
 
     // 文档预览
-    public static func previewDocFile(fileUrl: URL) {
+    public static func previewDocFile(model: RKFileModel) {
         
         let vc = RKDocumentPreviewVC()
-        vc.fileUrl = fileUrl
+        vc.fileModel = model
         UIApplication.topViewController()?.navigationController?.pushViewController(vc, animated: true)
     }
     
