@@ -62,7 +62,7 @@ extension UIImage {
     }
 }
 
-extension UIApplication {
+public extension UIApplication {
     class func topViewController() -> UIViewController? {
         let rootVC = UIApplication.shared.keyWindow?.rootViewController
         let topVC = _topViewController(vc: rootVC)
