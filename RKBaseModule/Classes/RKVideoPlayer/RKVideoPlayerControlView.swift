@@ -7,14 +7,14 @@
 
 import UIKit
 
-protocol RKVideoPlayerControlDelegate {
+protocol RKVideoPlayerControlDelegate: NSObjectProtocol {
     func playerStateChange(_ play: Bool)
     func seekProgress(_ progress: Float)
     func playerQuit()
 }
 
 class RKVideoPlayerControlView: UIView {
-    var delegate: RKVideoPlayerControlDelegate?
+    weak var delegate: RKVideoPlayerControlDelegate?
     var progressView: RKProgressView!
     var playCenterButton: UIButton!
     var quitButton: UIButton!
@@ -156,12 +156,10 @@ class RKVideoPlayerControlView: UIView {
     
     @objc private func changeControlState(hidden: Bool = true) {
         guard !progressView.isDragSlider, playButton.isSelected else { return }
-        UIView.animate(withDuration: 0.3) {
-            self.quitButton.isHidden = hidden
-            self.playButton.isHidden = hidden
-            self.playCenterButton.isHidden = hidden
-            self.stackView.isHidden = hidden
-        }
+        quitButton.isHidden = hidden
+        playButton.isHidden = hidden
+        playCenterButton.isHidden = hidden
+        stackView.isHidden = hidden
     }
     
     @objc private func quitAction() {

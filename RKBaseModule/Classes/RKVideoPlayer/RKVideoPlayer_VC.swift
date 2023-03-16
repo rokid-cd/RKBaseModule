@@ -8,14 +8,14 @@
 import UIKit
 import KSYMediaPlayer
 
-public protocol RKVideoPlayerDelegate {
+public protocol RKVideoPlayerDelegate: NSObjectProtocol {
     func playerQuit()
     func playerStateChange(_ play: Bool)
 }
 
 public class RKVideoPlayer_VC: UIViewController {
     
-    public var delegate: RKVideoPlayerDelegate?
+    public weak var delegate: RKVideoPlayerDelegate?
     
     private var url: URL?
     
@@ -111,12 +111,18 @@ public class RKVideoPlayer_VC: UIViewController {
         mediaPlayer.prepareToPlay()
     }
     
+    public func seekVideoTime(second: Double) {
+        let time = max(0, min(second, mediaPlayer.duration))
+        mediaPlayer.seek(to: time, accurate: true)
+    }
+    
     public func addMoreActionView(view: UIView) {
         controlView.stackView.addArrangedSubview(view)
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        mediaPlayer.removeObserver(self, forKeyPath: "playableDuration")
         mediaPlayer.removeObserver(self, forKeyPath: "currentPlaybackTime")
         mediaPlayer.stop()
     }

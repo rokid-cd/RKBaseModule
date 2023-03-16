@@ -268,13 +268,11 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         guard !progressView.isDragSlider, mediaPlayer.isPlaying() else {
             return
         }
-        UIView.animate(withDuration: 0.3) {
-            self.playButton.isHidden = hidden
-            self.dismissButton.isHidden = hidden
-            self.progressView.isHidden = hidden
-            self.downloadButton.isHidden = hidden
-            self.sizeLabel.isHidden = hidden
-        }
+        playButton.isHidden = hidden
+        dismissButton.isHidden = hidden
+        progressView.isHidden = hidden
+        downloadButton.isHidden = hidden
+        sizeLabel.isHidden = hidden
     }
 }
 
