@@ -37,17 +37,22 @@ TODO: Add long description of the pod here.
 #  s.default_subspec = 'RKPrompt'
       
   s.subspec 'RKFilePreview' do |ss|
-    ss.frameworks   = 'VideoToolbox'
-    ss.ios.library = 'z', 'iconv', 'c++', 'bz2'
-    ss.vendored_frameworks = 'RKBaseModule/Classes/Frameworks/*.framework'
-    ss.resources    = 'RKBaseModule/Assets/RKBaseModule.bundle'
     ss.source_files = 'RKBaseModule/Classes/RKFilePreview/**/*'
     
     ss.dependency 'RKBaseModule/RKPrompt'
     ss.dependency 'RKBaseModule/RKDownload'
     ss.dependency 'RKBaseModule/RKExtention'
+    ss.dependency 'RKBaseModule/RKVideoPlayer'
     ss.dependency 'SnapKit'
     ss.dependency 'Kingfisher'
+  end
+  
+  s.subspec 'RKVideoPlayer' do |ss|
+    ss.frameworks   = 'VideoToolbox'
+    ss.ios.library = 'z', 'iconv', 'c++', 'bz2'
+    ss.vendored_frameworks = 'RKBaseModule/Classes/Frameworks/*.framework'
+    ss.source_files = 'RKBaseModule/Classes/RKVideoPlayer/**/*'
+    ss.resources    = 'RKBaseModule/Assets/RKBaseModule.bundle'
   end
   
   s.subspec 'RKHUD' do |ss|

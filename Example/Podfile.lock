@@ -8,6 +8,7 @@ PODS:
     - RKBaseModule/RKPrompt (= 0.1.0)
     - RKBaseModule/RKReplayKit (= 0.1.0)
     - RKBaseModule/RKTransitioning (= 0.1.0)
+    - RKBaseModule/RKVideoPlayer (= 0.1.0)
   - RKBaseModule/RKDownload (0.1.0)
   - RKBaseModule/RKExtention (0.1.0)
   - RKBaseModule/RKFilePreview (0.1.0):
@@ -15,12 +16,14 @@ PODS:
     - RKBaseModule/RKDownload
     - RKBaseModule/RKExtention
     - RKBaseModule/RKPrompt
+    - RKBaseModule/RKVideoPlayer
     - SnapKit
   - RKBaseModule/RKHUD (0.1.0)
   - RKBaseModule/RKPrompt (0.1.0):
     - RKBaseModule/RKHUD
   - RKBaseModule/RKReplayKit (0.1.0)
   - RKBaseModule/RKTransitioning (0.1.0)
+  - RKBaseModule/RKVideoPlayer (0.1.0)
   - SnapKit (5.6.0)
 
 DEPENDENCIES:
@@ -37,7 +40,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Kingfisher: 016c8b653a35add51dd34a3aba36b580041acc74
-  RKBaseModule: c68c4a6e10af94deeb0298b154afa579e44adfa6
+  RKBaseModule: aaace6425f9382e5fc7589a5f131cd0bdc8c1469
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
 
 PODFILE CHECKSUM: 02fd7ecd61608a234ffa0f790c8d6334d118678a

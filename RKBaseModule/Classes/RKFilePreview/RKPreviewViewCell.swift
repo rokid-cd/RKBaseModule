@@ -12,13 +12,6 @@ import PhotosUI
 
 class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     
-    class ARIMSlider: UISlider {
-        override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-            let bounds: CGRect = self.bounds.insetBy(dx: -20, dy: -20)
-            return bounds.contains(point)
-        }
-    }
-    
     var autoPlay = false
     weak var photoBrowser: JXPhotoBrowser?
     private var videoModel: RKFileModel?
@@ -44,8 +37,8 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     
     private lazy var playButton: UIButton = {
         $0.frame.size = CGSize(width: 46, height: 46)
-        $0.setImage(Bundle.rkImage(named: "rk_video_play"), for: .normal)
-        $0.setImage(Bundle.rkImage(named: "rk_video_pause"), for: .selected)
+        $0.setImage(Bundle.rkImage(named: "rk_video_pauseBig"), for: .normal)
+        $0.setImage(Bundle.rkImage(named: "rk_video_playBig"), for: .selected)
         $0.addTarget(self, action: #selector(play), for: .touchUpInside)
         return $0
     }(UIButton(type: .custom))
@@ -64,31 +57,7 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         return $0
     }(UIButton(type: .custom))
     
-    private lazy var curTimeLabel: UILabel = {
-        $0.textColor = .white
-        $0.textAlignment = .center
-        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        $0.text = "00:00"
-        return $0
-    }(UILabel())
-    
-    private lazy var totalTimeLabel: UILabel = {
-        $0.textColor = .white
-        $0.textAlignment = .center
-        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        $0.text = "00:00"
-        return $0
-    }(UILabel())
-    
-    private lazy var sliderView: ARIMSlider = {
-        $0.minimumTrackTintColor = .init(hex: 0x194BFB)
-        $0.maximumTrackTintColor = UIColor.white.withAlphaComponent(0.6)
-        $0.setThumbImage(Bundle.rkImage(named: "rk_video_thumb")?.cicleImage(), for: .normal)
-        $0.addTarget(self, action: #selector(sliderBeginAction), for: .touchDown)
-        $0.addTarget(self, action: #selector(sliderChangeAction), for: .valueChanged)
-        $0.addTarget(self, action: #selector(sliderAction), for: .touchUpInside)
-        return $0
-    }(ARIMSlider())
+    private var progressView = RKProgressView()
     
     lazy var sizeLabel: UILabel = {
         $0.textAlignment = .center
@@ -116,9 +85,7 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         addSubview(imageView)
         addSubview(downloadButton)
         addSubview(dismissButton)
-        addSubview(curTimeLabel)
-        addSubview(sliderView)
-        addSubview(totalTimeLabel)
+        addSubview(progressView)
         addSubview(sizeLabel)
         addSubview(indicatorView)
         addSubview(playButton)
@@ -144,9 +111,7 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         indicatorView.center = imageView.center
         downloadButton.frame = CGRect(x: bounds.width-92-30, y: bounds.height-46-35, width: 46, height: 46)
         dismissButton.frame = CGRect(x: bounds.width-46-15, y: bounds.height-46-35, width: 46, height: 46)
-        curTimeLabel.frame = CGRect(x: 15, y: bounds.height-120, width: 46, height: 20)
-        totalTimeLabel.frame = CGRect(x: bounds.width-46-15, y: bounds.height-120, width: 46, height: 20)
-        sliderView.frame = CGRect(x: 66, y: bounds.height-112, width: bounds.width-132, height: 2)
+        progressView.frame = CGRect(x: 15, y: bounds.height-120, width: bounds.width-30, height: 20)
         sizeLabel.frame = CGRect(x: 15, y: bounds.height-31-43, width: 140, height: 31)
     }
     
@@ -166,7 +131,7 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     @objc private func handlePlayerNotify(notify: NSNotification) {
 
         if NSNotification.Name.MPMediaPlaybackIsPreparedToPlayDidChange == notify.name {
-            formatTime(time: mediaPlayer.duration, label: totalTimeLabel)
+            progressView.totalTimeSeconds = Float(mediaPlayer.duration)
             if autoPlay {
                 mediaPlayer.play()
                 playButton.isSelected = true
@@ -196,9 +161,10 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "currentPlaybackTime" {
-            guard !reloading, !isSlider, mediaPlayer.duration > 0 else { return }
-            formatTime(time: mediaPlayer.currentPlaybackTime, label: curTimeLabel)
-            sliderView.setValue(Float(mediaPlayer.currentPlaybackTime/mediaPlayer.duration), animated: true)
+            guard mediaPlayer.duration > 0 else { progressView.cacheProgress = 0; return }
+            progressView.cacheProgress = Float(mediaPlayer.playableDuration/mediaPlayer.duration)
+            guard !reloading, !progressView.isDragSlider else { return }
+            progressView.playProgress = Float(mediaPlayer.currentPlaybackTime/mediaPlayer.duration)
         }
     }
     
@@ -212,7 +178,11 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         initializeUIValue()
         mediaPlayer.setUrl(url)
         mediaPlayer.prepareToPlay()
-        
+        progressView.dragingSliderClosure = {[weak self] progress in
+            guard let self = self else { return }
+            let time = self.mediaPlayer.duration * Double(progress)
+            self.mediaPlayer.seek(to: time, accurate: true)
+        }
         if let fileSize = model.size, Double(fileSize) ?? 0 > 0 {
             sizeLabel.text = "文件大小：\(fileSize.sizeFormat)"
         } else {
@@ -225,21 +195,18 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     
     private func initializeUIValue() {
         mediaPlayer.view.isHidden = true
-        sliderView.setValue(0, animated: false)
-        sliderView.isHidden = false
-        totalTimeLabel.isHidden = false
-        curTimeLabel.isHidden = false
+        progressView.playProgress = 0
+        progressView.isHidden = false
         downloadButton.isHidden = false
         dismissButton.isHidden = false
         playButton.isHidden = false
         playButton.isSelected = false
         sizeLabel.isHidden = false
         indicatorView.stopAnimating()
-        formatTime(time: 0, label: curTimeLabel)
         if mediaPlayer.duration > 0 {
-            formatTime(time: mediaPlayer.duration, label: totalTimeLabel)
+            progressView.totalTimeSeconds = Float(mediaPlayer.duration)
         } else if let duration = videoModel?.duration  {
-            formatTime(time: Double(duration) ?? 0, label: totalTimeLabel)
+            progressView.totalTimeSeconds = Float(duration) ?? 0
         }
         thumImage()
     }
@@ -251,13 +218,6 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
                 self?.imageView.kf.setImage(with: thumbUrl)
             }
         }
-    }
-    
-    private func formatTime(time: Double, label: UILabel) {
-
-        let timeM = Int(ceil(time))/60
-        let timeS = Int(ceil(time))%60
-        label.text = String(format:"%0.2d:%0.2d", timeM,timeS)
     }
     
     @objc func play() {
@@ -305,35 +265,16 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     }
     
     @objc private func changeControlState(hidden: Bool = true) {
-        guard !isSlider, mediaPlayer.isPlaying() else {
+        guard !progressView.isDragSlider, mediaPlayer.isPlaying() else {
             return
         }
         UIView.animate(withDuration: 0.3) {
             self.playButton.isHidden = hidden
             self.dismissButton.isHidden = hidden
-            self.curTimeLabel.isHidden = hidden
-            self.totalTimeLabel.isHidden = hidden
-            self.sliderView.isHidden = hidden
+            self.progressView.isHidden = hidden
             self.downloadButton.isHidden = hidden
             self.sizeLabel.isHidden = hidden
         }
-    }
-    
-    private var isSlider = false
-    @objc private func sliderBeginAction() {
-        isSlider = true
-    }
-    
-    @objc private func sliderChangeAction() {
-        guard mediaPlayer.duration > 0 else { return }
-        let time = mediaPlayer.duration * Double(sliderView.value)
-        formatTime(time: time, label: curTimeLabel)
-    }
-    
-    @objc private func sliderAction() {
-        let time = mediaPlayer.duration * Double(sliderView.value)
-        mediaPlayer.seek(to: time, accurate: true)
-        isSlider = false
     }
 }
 
