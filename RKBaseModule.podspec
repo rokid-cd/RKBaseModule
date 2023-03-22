@@ -77,6 +77,7 @@ TODO: Add long description of the pod here.
   end
   
   s.subspec 'RKReplayKit' do |ss|
+    ss.ios.library = 'stdc++'
     ss.vendored_frameworks = 'RKBaseModule/Classes/RKReplayKit/RokidReplayKit.framework'
   end
   
