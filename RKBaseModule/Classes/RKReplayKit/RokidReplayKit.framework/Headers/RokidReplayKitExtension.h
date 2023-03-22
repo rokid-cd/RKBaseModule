@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)extensionProcessSampleBuffer:(CMSampleBufferRef)sampleBuffer
                             withType:(RPSampleBufferType)sampleBufferType;
 
-+ (void)monitorProcessSampleBuffer:(nullable void(^)(CVPixelBufferRef sampleBuffer))sampleBuffer;
++ (void)monitorProcessSampleBuffer:(nullable void(^)(CMSampleBufferRef sampleBuffer))sampleBuffer;
 @end
 
 NS_ASSUME_NONNULL_END
