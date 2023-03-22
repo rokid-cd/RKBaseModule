@@ -152,10 +152,8 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
             
         }
         if NSNotification.Name.MPMoviePlayerFirstVideoFrameRendered == notify.name {
-            UIView.animate(withDuration: 0.2) {
-                self.imageView.image = nil
-                self.mediaPlayer.view.isHidden = false
-            }
+            self.imageView.image = nil
+            self.mediaPlayer.view.isHidden = false
         }
     }
     

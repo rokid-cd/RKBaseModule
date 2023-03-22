@@ -28,6 +28,7 @@ public class RKVideoPlayer_VC: UIViewController {
     private lazy var mediaPlayer: KSYMoviePlayerController = {
         let player = KSYMoviePlayerController()
         player.shouldAutoplay = true
+        player.shouldHideVideo = true
         return player
     }()
  
@@ -57,11 +58,11 @@ public class RKVideoPlayer_VC: UIViewController {
     
     private func setupObservers() {
         mediaPlayer.addObserver(self, forKeyPath: "currentPlaybackTime", options: .new, context: nil)
-        mediaPlayer.addObserver(self, forKeyPath: "playableDuration", options: .new, context: nil)
         registerObserver(name: NSNotification.Name.MPMediaPlaybackIsPreparedToPlayDidChange)
         registerObserver(name: NSNotification.Name.MPMoviePlayerPlaybackDidFinish)
         registerObserver(name: NSNotification.Name.MPMoviePlayerLoadStateDidChange)
         registerObserver(name: NSNotification.Name.MPMoviePlayerFirstVideoFrameRendered)
+        registerObserver(name: NSNotification.Name.MPMoviePlayerFirstAudioFrameRendered)
         NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackgroundNotification), name: UIApplication.didEnterBackgroundNotification, object: nil)
     }
     
@@ -90,23 +91,26 @@ public class RKVideoPlayer_VC: UIViewController {
             controlView.resetUIValue()
             reloading = true
         }
-        if NSNotification.Name.MPMoviePlayerFirstVideoFrameRendered == notify.name {
+        if NSNotification.Name.MPMoviePlayerFirstAudioFrameRendered == notify.name {
+            // 解决有的视频卡帧以及渲染失败bug
+            mediaPlayer.shouldHideVideo = false
+            mediaPlayer.seek(to: 0, accurate: true)
         }
     }
     
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "currentPlaybackTime" {
-            guard !reloading, !progressView.isDragSlider, mediaPlayer.duration > 0 else { return }
-            progressView.playProgress = Float(mediaPlayer.currentPlaybackTime/mediaPlayer.duration)
-            
-        } else if keyPath == "playableDuration" {
             guard mediaPlayer.duration > 0 else { progressView.cacheProgress = 0; return }
             progressView.cacheProgress = Float(mediaPlayer.playableDuration/mediaPlayer.duration)
+            guard !reloading, !progressView.isDragSlider else { return }
+            progressView.playProgress = Float(mediaPlayer.currentPlaybackTime/mediaPlayer.duration)
+            
         }
     }
     
     public func playWithURL(url: URL) {
         self.url = url
+        mediaPlayer.reset(false)
         mediaPlayer.setUrl(url)
         mediaPlayer.prepareToPlay()
     }
@@ -122,7 +126,6 @@ public class RKVideoPlayer_VC: UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        mediaPlayer.removeObserver(self, forKeyPath: "playableDuration")
         mediaPlayer.removeObserver(self, forKeyPath: "currentPlaybackTime")
         mediaPlayer.stop()
     }

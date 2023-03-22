@@ -84,6 +84,7 @@ class RKVideoPlayerControlView: UIView {
         progressView = RKProgressView()
         progressView.dragingSliderClosure = {[weak self] progress in
             guard let self = self else { return }
+            self.timerShowControl()
             self.delegate?.seekProgress(progress)
         }
         stackView.addArrangedSubview(progressView)
