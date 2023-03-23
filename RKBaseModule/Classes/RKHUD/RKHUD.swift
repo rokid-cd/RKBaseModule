@@ -310,10 +310,12 @@ public class RKHUD: UIView {
 
         if (toolbarHUD == nil) {
             toolbarHUD = UIToolbar(frame: CGRect.zero)
+            toolbarHUD?.barStyle = .black
             toolbarHUD?.isTranslucent = true
-            toolbarHUD?.clipsToBounds = true
-            toolbarHUD?.layer.cornerRadius = 10
-            toolbarHUD?.layer.masksToBounds = true
+            toolbarHUD?.layer.shadowColor = UIColor(hex: 0x000000).withAlphaComponent(0.15).cgColor
+            toolbarHUD?.layer.shadowOffset = CGSize(width:0, height:5)
+            toolbarHUD?.layer.shadowRadius = 10
+            toolbarHUD?.layer.shadowOpacity = 1
             viewBackground?.addSubview(toolbarHUD!)
         }
 
@@ -509,7 +511,7 @@ public class RKHUD: UIView {
 
         let mainWindow = hudInView ?? UIApplication.shared.keyWindow ?? UIApplication.shared.windows.first ?? UIWindow()
         let screen = mainWindow.bounds
-        let center = CGPoint(x: screen.size.width/2, y: (screen.size.height-heightKeyboard)/2)
+        let center = CGPoint(x: screen.size.width/2, y: (screen.size.height-heightKeyboard)/2-70)
 
         UIView.animate(withDuration: animationDuration, delay: 0, options: .allowUserInteraction, animations: {
             self.toolbarHUD?.center = center
@@ -610,7 +612,7 @@ public class RKHUD: UIView {
         spinner.color = colorAnimation
         spinner.hidesWhenStopped = true
         spinner.startAnimating()
-        spinner.transform = CGAffineTransform(scaleX: 1.6, y: 1.6)
+        spinner.transform = CGAffineTransform(scaleX: 1.4, y: 1.4)
         view.addSubview(spinner)
     }
 
