@@ -77,7 +77,7 @@ class RKVideoPlayerControlView: UIView {
         stackView.axis = .horizontal
         stackView.alignment = .center
         stackView.distribution = .fill
-        stackView.spacing = 14
+        stackView.spacing = 10
         stackView.isHidden = false
         addSubview(stackView)
         

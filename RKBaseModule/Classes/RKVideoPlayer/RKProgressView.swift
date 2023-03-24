@@ -20,10 +20,12 @@ public class RKProgressView: UIView {
     public var dragingSliderClosure: ((Float)->Void)?
     public var totalTimeSeconds: Float = 0 {
         didSet {
+            playedTimeLabel.attributedText = formatTime(time: playProgress * totalTimeSeconds)
             totalTimeLabel.attributedText = formatTime(time: totalTimeSeconds)
-            playedTimeLabel.snp.makeConstraints { make in
-                make.width.equalTo((totalTimeSeconds > 60 * 60) ? 69 : 46)
+            playedTimeLabel.snp.updateConstraints { make in
+                make.width.equalTo((totalTimeSeconds > 60 * 60) ? 72 : 46)
             }
+            superview?.layoutIfNeeded()
         }
     }
     public var cacheProgress: Float = 0 {
