@@ -598,9 +598,10 @@ public class RKHUD: UIView {
         labelStatus?.removeFromSuperview();            labelStatus = nil
         toolbarHUD?.removeFromSuperview();            toolbarHUD = nil
         viewBackground?.removeFromSuperview();        viewBackground = nil
-
+        hudInView = nil
         timer?.invalidate()
         timer = nil
+        
     }
 
     // MARK: - Animation
