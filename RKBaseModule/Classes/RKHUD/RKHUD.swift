@@ -205,9 +205,9 @@ public class RKHUD: UIView {
 
     private var colorBackground    = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2)
     private var colorHUD           = UIColor.systemGray
-    private var colorStatus        = UIColor.darkGray
-    private var colorAnimation     = UIColor.lightGray
-    private var colorProgress      = UIColor.lightGray
+    private var colorStatus        = UIColor.white
+    private var colorAnimation     = UIColor.white
+    private var colorProgress      = UIColor.white
 
     private var fontStatus         = UIFont.boldSystemFont(ofSize: 20)
     private var imageSuccess       = UIImage()
