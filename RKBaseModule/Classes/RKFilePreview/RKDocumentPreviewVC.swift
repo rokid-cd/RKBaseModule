@@ -258,8 +258,8 @@ class RKDocumentPreviewVC: UIViewController {
             guard let fileUrl = loacalFileURL else { return }
             let vc = UIDocumentInteractionController(url: fileUrl)
             vc.delegate = self
-            vc.name = fileUrl.lastPathComponent
-            vc.presentOptionsMenu(from: actionButton.frame, in: self.view, animated: true)
+            vc.name = title
+            vc.presentOptionsMenu(from: navigationItem.rightBarButtonItem!, animated: true)
             
         case .download:
             guard let fileModel = fileModel, let fileUrl = fileModel.fileUrl else { return }

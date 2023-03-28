@@ -12,6 +12,10 @@ class ARIMSlider: UISlider {
         let bounds: CGRect = self.bounds.insetBy(dx: -20, dy: -20)
         return bounds.contains(point)
     }
+    
+    override func trackRect(forBounds bounds: CGRect) -> CGRect {
+        return CGRect(x: 0, y: 0, width: bounds.size.width, height: 4)
+    }
 }
 
 public class RKProgressView: UIView {
@@ -109,10 +113,10 @@ public class RKProgressView: UIView {
         }
         
         slider.snp.makeConstraints { make in
-            make.centerY.equalToSuperview().offset(-1)
-            make.left.equalTo(playedTimeLabel.snp.right).offset(5)
-            make.right.equalTo(totalTimeLabel.snp_left).offset(-5)
-            make.height.equalTo(6)
+            make.left.equalTo(playedTimeLabel.snp.right).offset(6)
+            make.right.equalTo(totalTimeLabel.snp_left).offset(-6)
+            make.centerY.equalToSuperview()
+            make.height.equalTo(4)
         }
     }
     
