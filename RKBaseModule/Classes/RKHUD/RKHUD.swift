@@ -191,7 +191,7 @@ public class RKHUD: UIView {
 
     private var hudInView: UIView?
     private var viewBackground: UIView?
-    private var toolbarHUD: UIToolbar?
+    private var toolbarHUD: UIView?
     private var labelStatus: UILabel?
 
     private var viewProgress: ProgressView?
@@ -209,7 +209,7 @@ public class RKHUD: UIView {
     private var colorAnimation     = UIColor.white
     private var colorProgress      = UIColor.white
 
-    private var fontStatus         = UIFont.boldSystemFont(ofSize: 20)
+    private var fontStatus         = UIFont.boldSystemFont(ofSize: 18)
     private var imageSuccess       = UIImage()
     private var imageError         = UIImage()
 
@@ -309,9 +309,7 @@ public class RKHUD: UIView {
     private func setupToolbar() {
 
         if (toolbarHUD == nil) {
-            toolbarHUD = UIToolbar(frame: CGRect.zero)
-            toolbarHUD?.barStyle = .black
-            toolbarHUD?.isTranslucent = true
+            toolbarHUD = UIView()
             toolbarHUD?.layer.shadowColor = UIColor(hex: 0x000000).withAlphaComponent(0.15).cgColor
             toolbarHUD?.layer.shadowOffset = CGSize(width:0, height:5)
             toolbarHUD?.layer.shadowRadius = 10
@@ -449,10 +447,10 @@ public class RKHUD: UIView {
             let sizeMax = CGSize(width: 250, height: 250)
             let attributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: labelStatus?.font as Any]
             var rectLabel = text.boundingRect(with: sizeMax, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)
-            rectLabel.origin.x = 20
-            rectLabel.origin.y = 20
+            rectLabel.origin.x = 15
+            rectLabel.origin.y = 15
             labelStatus?.frame = rectLabel
-            toolbarHUD?.bounds = CGRect(x: 0, y: 0, width: rectLabel.size.width + 40, height: rectLabel.size.height + 40)
+            toolbarHUD?.bounds = CGRect(x: 0, y: 0, width: rectLabel.size.width + 30, height: rectLabel.size.height + 30)
             return
         }
         

@@ -16,6 +16,16 @@ class ARIMSlider: UISlider {
     override func trackRect(forBounds bounds: CGRect) -> CGRect {
         return CGRect(x: 0, y: 0, width: bounds.size.width, height: 4)
     }
+    
+    override func thumbRect(forBounds bounds: CGRect, trackRect rect: CGRect, value: Float) -> CGRect {
+        let thumbRect = super.thumbRect(forBounds: bounds, trackRect: rect, value: value)
+        if value == 0 {
+            return CGRect(x: 0, y: thumbRect.origin.y, width: thumbRect.size.width, height: thumbRect.size.height)
+        } else if value == 1 {
+            return CGRect(x: rect.size.width - thumbRect.size.width, y: thumbRect.origin.y, width: thumbRect.size.width, height: thumbRect.size.height)
+        }
+        return thumbRect
+    }
 }
 
 public class RKProgressView: UIView {
@@ -106,17 +116,14 @@ public class RKProgressView: UIView {
         }
         
         progressView.snp.makeConstraints { make in
-            make.left.equalTo(playedTimeLabel.snp.right).offset(6)
-            make.right.equalTo(totalTimeLabel.snp_left).offset(-6)
+            make.left.equalTo(playedTimeLabel.snp.right).offset(8)
+            make.right.equalTo(totalTimeLabel.snp.left).offset(-8)
             make.centerY.equalToSuperview()
             make.height.equalTo(4)
         }
         
         slider.snp.makeConstraints { make in
-            make.left.equalTo(playedTimeLabel.snp.right).offset(6)
-            make.right.equalTo(totalTimeLabel.snp_left).offset(-6)
-            make.centerY.equalToSuperview()
-            make.height.equalTo(4)
+            make.left.right.centerY.height.equalTo(progressView)
         }
     }
     

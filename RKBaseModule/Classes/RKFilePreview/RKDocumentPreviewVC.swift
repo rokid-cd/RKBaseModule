@@ -17,6 +17,13 @@ class RKDocumentPreviewVC: UIViewController {
     
     let imageView: UIImageView = UIImageView()
     
+    lazy var documentVC: UIDocumentInteractionController = {
+       let vc = UIDocumentInteractionController()
+        vc.delegate = self
+        vc.name = title
+        return vc
+    }()
+    
     lazy var titleLab: UILabel = {
         let lab = UILabel()
         lab.textColor = UIColor(hex: 0x333333)
@@ -28,7 +35,7 @@ class RKDocumentPreviewVC: UIViewController {
     
     lazy var infoLab: UILabel = {
         let lab = UILabel()
-        lab.textColor = UIColor(hex: 0x8FA2C3)
+        lab.textColor = UIColor(hex: 0x59667C)
         lab.font = UIFont.systemFont(ofSize: 13)
         lab.textAlignment = .center
         lab.numberOfLines = 0
@@ -256,10 +263,8 @@ class RKDocumentPreviewVC: UIViewController {
         switch actionState {
         case .normal:
             guard let fileUrl = loacalFileURL else { return }
-            let vc = UIDocumentInteractionController(url: fileUrl)
-            vc.delegate = self
-            vc.name = title
-            vc.presentOptionsMenu(from: navigationItem.rightBarButtonItem!, animated: true)
+            documentVC.url = fileUrl
+            documentVC.presentOptionsMenu(from: navigationItem.rightBarButtonItem!, animated: true)
             
         case .download:
             guard let fileModel = fileModel, let fileUrl = fileModel.fileUrl else { return }

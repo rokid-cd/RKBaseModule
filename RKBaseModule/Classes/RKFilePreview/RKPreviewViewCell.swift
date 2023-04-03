@@ -16,6 +16,23 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     weak var photoBrowser: JXPhotoBrowser?
     private var videoModel: RKFileModel?
     
+    private lazy var topView: UIView = {
+        $0.backgroundColor = .white
+        $0.addSubview(self.dismissButton)
+        $0.isHidden = true
+        return $0
+    }(UIView())
+    
+    private lazy var dismissButton: UIButton = {
+        $0.setImage(Bundle.rkImage(named: "rk_back"), for: .normal)
+        $0.addTarget(self, action: #selector(dismissAction), for: .touchUpInside)
+        $0.setTitleColor(.black, for: .normal)
+        $0.titleLabel?.font = UIFont.systemFont(ofSize: 23, weight: .medium)
+        $0.titleLabel?.lineBreakMode = .byTruncatingTail
+        $0.contentHorizontalAlignment = .left
+        return $0
+    }(UIButton(type: .custom))
+    
     private lazy var mediaPlayer: KSYMoviePlayerController = {
         let player = KSYMoviePlayerController()
         player.view.autoresizingMask = [.flexibleWidth,.flexibleHeight]
@@ -49,14 +66,6 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         return $0
     }(UIButton(type: .custom))
     
-    private lazy var dismissButton: UIButton = {
-        $0.frame = CGRect(x: 15, y: bounds.height-46-35, width: 46, height: 46)
-        $0.layer.cornerRadius = 23
-        $0.setImage(Bundle.rkImage(named: "rk_arrow_down"), for: .normal)
-        $0.addTarget(self, action: #selector(dismissAction), for: .touchUpInside)
-        return $0
-    }(UIButton(type: .custom))
-    
     private var progressView = RKProgressView()
     
     lazy var sizeLabel: UILabel = {
@@ -78,18 +87,21 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
 
     required override init(frame: CGRect) {
         super.init(frame: .zero)
-        backgroundColor = .black
-        let tap = UITapGestureRecognizer(target: self, action: #selector(tapClick))
-        imageView.addGestureRecognizer(tap)
+        backgroundColor = .clear
         imageView.addSubview(mediaPlayer.view)
         addSubview(imageView)
         addSubview(downloadButton)
-        addSubview(dismissButton)
         addSubview(progressView)
         addSubview(sizeLabel)
         addSubview(indicatorView)
         addSubview(playButton)
+        addSubview(topView)
         setupObservers()
+        let tap = UITapGestureRecognizer(target: self, action: #selector(onTap))
+        imageView.addGestureRecognizer(tap)
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(onPan(_:)))
+        pan.delegate = self
+        addGestureRecognizer(pan)
     }
     
     required init?(coder: NSCoder) {
@@ -105,12 +117,15 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        imageView.frame = bounds
-        mediaPlayer.view.frame = imageView.bounds
+        if beganFrame == .zero {
+            imageView.frame = bounds
+            mediaPlayer.view.frame = imageView.bounds
+        }
+        topView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: UIApplication.shared.statusBarFrame.height + 44)
+        dismissButton.frame = CGRect(x: 15, y: UIApplication.shared.statusBarFrame.height, width: bounds.width - 30, height: 44)
         playButton.center = imageView.center
         indicatorView.center = imageView.center
-        downloadButton.frame = CGRect(x: bounds.width-92-30, y: bounds.height-46-35, width: 46, height: 46)
-        dismissButton.frame = CGRect(x: bounds.width-46-15, y: bounds.height-46-35, width: 46, height: 46)
+        downloadButton.frame = CGRect(x: bounds.width-46-15, y: bounds.height-46-35, width: 46, height: 46)
         progressView.frame = CGRect(x: 15, y: bounds.height-120, width: bounds.width-30, height: 20)
         sizeLabel.frame = CGRect(x: 15, y: bounds.height-31-43, width: 140, height: 31)
     }
@@ -171,7 +186,8 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         guard let url = model.fileUrl else { return }
         
         videoModel = model
-        
+        topView.isHidden = model.fileName?.isEmpty ?? true
+        dismissButton.setTitle("  \(model.fileName ?? "")", for: .normal)
         mediaPlayer.reset(false)
         initializeUIValue()
         mediaPlayer.setUrl(url)
@@ -196,10 +212,11 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         progressView.playProgress = 0
         progressView.isHidden = false
         downloadButton.isHidden = false
-        dismissButton.isHidden = false
         playButton.isHidden = false
         playButton.isSelected = false
         sizeLabel.isHidden = false
+        topView.alpha = 1
+        topView.frame = CGRect(x: 0, y: 0, width: self.bounds.width, height: UIApplication.shared.statusBarFrame.height + 44)
         indicatorView.stopAnimating()
         if mediaPlayer.duration > 0 {
             progressView.totalTimeSeconds = Float(mediaPlayer.duration)
@@ -250,11 +267,92 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
         photoBrowser?.dismiss()
     }
 
-    @objc private func tapClick() {
+    @objc private func onTap() {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(hiddenControl), object: nil)
         changeControlState(hidden: !playButton.isHidden)
         if !playButton.isHidden {
             perform(#selector(hiddenControl), with: nil, afterDelay: 3)
+        }
+    }
+    
+    /// 记录pan手势开始时imageView的位置
+    private var beganFrame = CGRect.zero
+    
+    /// 记录pan手势开始时，手势位置
+    private var beganTouch = CGPoint.zero
+    
+    @objc open func onPan(_ pan: UIPanGestureRecognizer) {
+
+        switch pan.state {
+        case .began:
+            beganFrame = imageView.frame
+            beganTouch = pan.location(in: self)
+            progressView.alpha = 0
+            downloadButton.alpha = 0
+            sizeLabel.alpha = 0
+            playButton.alpha = 0
+            topView.alpha = 0
+        case .changed:
+            let result = panResult(pan)
+            imageView.frame = result.frame
+            photoBrowser?.maskView.alpha = result.scale * result.scale
+            photoBrowser?.setStatusBar(hidden: false)
+            photoBrowser?.pageIndicator?.isHidden = result.scale < 0.99
+        case .ended, .cancelled:
+            imageView.frame = panResult(pan).frame
+            let isDown = pan.velocity(in: self).y > 0
+            if isDown {
+                photoBrowser?.dismiss()
+            } else {
+                photoBrowser?.maskView.alpha = 1.0
+                photoBrowser?.setStatusBar(hidden: false)
+                photoBrowser?.pageIndicator?.isHidden = false
+                resetImageViewPosition()
+            }
+            let alpha = photoBrowser?.maskView.alpha ?? 0
+            progressView.alpha = alpha
+            downloadButton.alpha = alpha
+            sizeLabel.alpha = alpha
+            playButton.alpha = alpha
+            topView.alpha = sizeLabel.isHidden ? 0 : alpha
+        default:
+            resetImageViewPosition()
+        }
+    }
+    
+    /// 计算拖动时图片应调整的frame和scale值
+    private func panResult(_ pan: UIPanGestureRecognizer) -> (frame: CGRect, scale: CGFloat) {
+        // 拖动偏移量
+        let translation = pan.translation(in: self)
+        let currentTouch = pan.location(in: self)
+        
+        // 由下拉的偏移值决定缩放比例，越往下偏移，缩得越小。scale值区间[0.3, 1.0]
+        let scale = min(1.0, max(0.3, 1 - translation.y / bounds.height))
+        
+        let width = beganFrame.size.width * scale
+        let height = beganFrame.size.height * scale
+        
+        // 计算x和y。保持手指在图片上的相对位置不变。
+        // 即如果手势开始时，手指在图片X轴三分之一处，那么在移动图片时，保持手指始终位于图片X轴的三分之一处
+        let xRate = (beganTouch.x - beganFrame.origin.x) / beganFrame.size.width
+        let currentTouchDeltaX = xRate * width
+        let x = currentTouch.x - currentTouchDeltaX
+        
+        let yRate = (beganTouch.y - beganFrame.origin.y) / beganFrame.size.height
+        let currentTouchDeltaY = yRate * height
+        let y = currentTouch.y - currentTouchDeltaY
+        
+        return (CGRect(x: x.isNaN ? 0 : x, y: y.isNaN ? 0 : y, width: width, height: height), scale)
+    }
+    
+    /// 复位ImageView
+    private func resetImageViewPosition() {
+        UIView.animate(withDuration: 0.25) {
+            self.imageView.frame = CGRect(origin: .zero, size: self.bounds.size)
+            self.mediaPlayer.view.frame = self.imageView.bounds
+        } completion: { _ in
+            self.beganFrame = .zero
+            self.beganTouch = .zero
         }
     }
     
@@ -267,10 +365,15 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
             return
         }
         playButton.isHidden = hidden
-        dismissButton.isHidden = hidden
         progressView.isHidden = hidden
         downloadButton.isHidden = hidden
         sizeLabel.isHidden = hidden
+        
+        UIView.animate(withDuration: 0.2) {
+            self.topView.alpha = hidden ? 0 : 1
+            let height = self.topView.bounds.size.height
+            self.topView.frame = CGRect(x: 0, y: hidden ? -height : 0, width: self.bounds.width, height: height)
+        }
     }
 }
 
@@ -278,17 +381,26 @@ extension RKPreviewVideoCell {
     @objc private func downloadAction() {
         
         guard let fileUrl = videoModel?.fileUrl else { return }
-        RKPrompt.showLoading(inView: self)
         if fileUrl.isFileURL {
             self.saveLoacalVideo(fileUrl)
         } else {
-            RKDownloadManager.downLoadFile(fileUrl: fileUrl) { _ in } completion: {[weak self] error, path in
+            let sizeText = sizeLabel.text
+            RKDownloadManager.downLoadFile(fileUrl: fileUrl) { [weak self] progress in
+                let totalCount = progress.totalUnitCount
+                let completedCount = progress.completedUnitCount
+                guard let self = self, totalCount > 0 else { return }
+                self.sizeLabel.text = "\(Int(Double(completedCount)/Double(totalCount) * 100))%"
+                if completedCount >= totalCount {
+                    self.sizeLabel.text = "下载完成"
+                }
+            } completion: { [weak self] error, path in
                 guard let self = self else { return }
                 if let _ = error {
-                    RKPrompt.hidenLoading(inView: self)
-                    RKPrompt.showToast(withText: "下载失败", inView: self)
+                    RKPrompt.showToast(withText: "视频保存失败", inView: self)
+                    self.sizeLabel.text = sizeText
                 } else {
                     self.saveLoacalVideo(URL(fileURLWithPath: path))
+                    self.sizeLabel.text = sizeText
                 }
             }
         }
@@ -300,17 +412,35 @@ extension RKPreviewVideoCell {
             PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: fileUrl)
         } completionHandler: { success, error in
             DispatchQueue.main.async {
-                RKPrompt.hidenLoading(inView: self)
                 if (success) {
-                    RKPrompt.showToast(withText: "保存成功", inView: self)
+                    RKPrompt.showToast(withText: "视频保存成功", inView: self)
                 } else {
-                    RKPrompt.showToast(withText: "保存失败", inView: self)
+                    RKPrompt.showToast(withText: "视频保存失败", inView: self)
                 }
             }
         }
     }
 }
 
+extension RKPreviewVideoCell: UIGestureRecognizerDelegate {
+    open override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        // 只处理pan手势
+        guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {
+            return true
+        }
+        let velocity = pan.velocity(in: self)
+        // 向上滑动时，不响应手势
+        if velocity.y < 0 {
+            return false
+        }
+        // 横向滑动时，不响应pan手势
+        if abs(Int(velocity.x)) > Int(velocity.y) {
+            return false
+        }
+        // 响应允许范围内的下滑手势
+        return true
+    }
+}
 
 /// 加载进度环
 open class JXPhotoBrowserProgressView: UIView {
@@ -388,6 +518,23 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
     let progressView = JXPhotoBrowserProgressView()
     
     var imageModel: RKFileModel?
+    private lazy var topView: UIView = {
+        $0.backgroundColor = .white
+        $0.addSubview(self.dismissButton)
+        $0.isHidden = true
+        return $0
+    }(UIView())
+    
+    private lazy var dismissButton: UIButton = {
+        $0.setImage(Bundle.rkImage(named: "rk_back"), for: .normal)
+        $0.addTarget(self, action: #selector(dismissAction), for: .touchUpInside)
+        $0.setTitleColor(.black, for: .normal)
+        $0.titleLabel?.font = UIFont.systemFont(ofSize: 23, weight: .medium)
+        $0.titleLabel?.lineBreakMode = .byTruncatingTail
+        $0.contentHorizontalAlignment = .left
+        return $0
+    }(UIButton(type: .custom))
+    
     lazy var downloadButton: UIButton = {
         $0.setImage(Bundle.rkImage(named: "rk_chat_down"), for: .normal)
         $0.addTarget(self, action: #selector(downloadAction), for: .touchUpInside)
@@ -409,6 +556,7 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
         addSubview(progressView)
         addSubview(downloadButton)
         addSubview(sizeLabel)
+        addSubview(topView)
     }
     
     override func layoutSubviews() {
@@ -416,6 +564,12 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
         progressView.center = CGPoint(x: bounds.width / 2, y: bounds.height / 2)
         downloadButton.frame = CGRect(x: bounds.width-46-15, y: bounds.height-46-35, width: 46, height: 46)
         sizeLabel.frame = CGRect(x: 15, y: bounds.height-31-43, width: 140, height: 31)
+        topView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: UIApplication.shared.statusBarFrame.height + 44)
+        dismissButton.frame = CGRect(x: 15, y: UIApplication.shared.statusBarFrame.height, width: bounds.width - 30, height: 44)
+    }
+    
+    @objc private func dismissAction() {
+        photoBrowser?.dismiss()
     }
     
     override func onPan(_ pan: UIPanGestureRecognizer) {
@@ -425,20 +579,35 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
             progressView.alpha = 0
             downloadButton.alpha = 0
             sizeLabel.alpha = 0
+            topView.alpha = 0
+            photoBrowser?.setStatusBar(hidden: false)
             
         case .ended, .cancelled:
             let alpha = photoBrowser?.maskView.alpha ?? 0
             progressView.alpha = alpha
             downloadButton.alpha = alpha
             sizeLabel.alpha = alpha
+            topView.alpha = sizeLabel.isHidden ? 0 : alpha
+            photoBrowser?.setStatusBar(hidden: false)
         default: break
+        }
+    }
+    
+    /// 单击
+    @objc override func onSingleTap(_ tap: UITapGestureRecognizer) {
+        let aiphaZero = topView.alpha == 0
+        UIView.animate(withDuration: 0.2) {
+            self.topView.alpha = aiphaZero ? 1 : 0
+            let height = self.topView.bounds.size.height
+            self.topView.frame = CGRect(x: 0, y: aiphaZero ? 0 : -height, width: self.bounds.width, height: height)
         }
     }
     
     func reloadImage(_ model: RKFileModel) {
         
         imageModel = model
-        
+        topView.isHidden = model.fileName?.isEmpty ?? true
+        dismissButton.setTitle("  \(model.fileName ?? "")", for: .normal)
         RKFilePreview.trustHost(fileUrl: model.fileUrl)
         imageView.kf.setImage(with: model.thumbUrl)
         
@@ -471,20 +640,38 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
     
     //保存到相册
     @objc func downloadAction() {
-        guard let image = imageView.image else {
-            RKPrompt.showToast(withText: "保存失败", inView: self)
+        
+        if let image = imageView.image {
+            UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
             return
         }
-        RKPrompt.showLoading(inView: self)
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
+        guard let fileUrl = imageModel?.fileUrl else { return }
+        let sizeText = sizeLabel.text
+        RKDownloadManager.downLoadFile(fileUrl: fileUrl) { [weak self] progress in
+            let totalCount = progress.totalUnitCount
+            let completedCount = progress.completedUnitCount
+            guard let self = self, totalCount > 0 else { return }
+            self.sizeLabel.text = "\(Int(Double(completedCount)/Double(totalCount) * 100))%"
+            if completedCount >= totalCount {
+                self.sizeLabel.text = "下载完成"
+            }
+        } completion: { [weak self] error, path in
+            guard let self = self else { return }
+            if error == nil, let image = UIImage(contentsOfFile: path) {
+                UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
+                
+            } else {
+                RKPrompt.showToast(withText: "图片保存失败", inView: self)
+            }
+            self.sizeLabel.text = sizeText
+        }
     }
     
     @objc func savedPhotosAlbum(image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: AnyObject) {
-        RKPrompt.hidenLoading(inView: self)
         if error != nil {
-            RKPrompt.showToast(withText: "保存失败", inView: self)
+            RKPrompt.showToast(withText: "图片保存失败", inView: self)
         }else{
-            RKPrompt.showToast(withText: "保存成功", inView: self)
+            RKPrompt.showToast(withText: "图片保存成功", inView: self)
         }
     }
 }
