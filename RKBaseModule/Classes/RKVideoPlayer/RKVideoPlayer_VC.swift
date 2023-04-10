@@ -73,7 +73,7 @@ public class RKVideoPlayer_VC: UIViewController {
     @objc private func didEnterBackgroundNotification() {
         if mediaPlayer.isPlaying() {
             mediaPlayer.pause()
-            controlView.setupPlayState(play: true)
+            controlView.setupPlayState(play: false)
         }
     }
     
@@ -122,6 +122,15 @@ public class RKVideoPlayer_VC: UIViewController {
     
     public func addMoreActionView(view: UIView) {
         controlView.stackView.addArrangedSubview(view)
+    }
+    
+    public func switchPlayState(play: Bool) {
+        if play {
+            mediaPlayer.play()
+        } else {
+            mediaPlayer.pause()
+        }
+        controlView.setupPlayState(play: play)
     }
     
     deinit {
