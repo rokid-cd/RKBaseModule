@@ -49,6 +49,7 @@ class RKVideoPlayerControlView: UIView {
         
         indicatorView = UIActivityIndicatorView(style: .whiteLarge)
         indicatorView.hidesWhenStopped = true
+        indicatorView.startAnimating()
         addSubview(indicatorView)
         
         quitButton = UIButton(type: .custom)
