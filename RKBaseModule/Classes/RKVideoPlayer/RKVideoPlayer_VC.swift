@@ -77,19 +77,18 @@ public class RKVideoPlayer_VC: UIViewController {
         }
     }
     
-    private var reloading = false
     @objc private func handlePlayerNotify(notify: NSNotification) {
 
         if NSNotification.Name.MPMediaPlaybackIsPreparedToPlayDidChange == notify.name {
             progressView.totalTimeSeconds = Float(mediaPlayer.duration)
-            reloading = false
+
         }
         if NSNotification.Name.MPMoviePlayerLoadStateDidChange ==  notify.name {
             controlView.isloading = mediaPlayer.loadState == .stalled
         }
         if NSNotification.Name.MPMoviePlayerPlaybackDidFinish == notify.name {
             controlView.resetUIValue()
-            reloading = true
+            seekVideoTime(second: 0)
         }
         if NSNotification.Name.MPMoviePlayerFirstAudioFrameRendered == notify.name {
             // 解决有的视频卡帧以及渲染失败bug
@@ -102,7 +101,7 @@ public class RKVideoPlayer_VC: UIViewController {
         if keyPath == "currentPlaybackTime" {
             guard mediaPlayer.duration > 0 else { progressView.cacheProgress = 0; return }
             progressView.cacheProgress = Float(mediaPlayer.playableDuration/mediaPlayer.duration)
-            guard !reloading, !progressView.isDragSlider else { return }
+            guard !progressView.isDragSlider else { return }
             progressView.playProgress = Float(mediaPlayer.currentPlaybackTime/mediaPlayer.duration)
             
         }
@@ -115,22 +114,25 @@ public class RKVideoPlayer_VC: UIViewController {
         mediaPlayer.prepareToPlay()
     }
     
-    public func seekVideoTime(second: Double) {
-        let time = max(0, min(second, mediaPlayer.duration))
-        mediaPlayer.seek(to: time, accurate: true)
-    }
-    
     public func addMoreActionView(view: UIView) {
         controlView.stackView.addArrangedSubview(view)
     }
     
+    public func seekVideoTime(second: Double) {
+        guard mediaPlayer.duration > 0 else { return }
+        let time = max(0, min(second, mediaPlayer.duration))
+        mediaPlayer.seek(to: time, accurate: true)
+        progressView.playProgress = Float(second/mediaPlayer.duration)
+    }
+    
     public func switchPlayState(play: Bool) {
-        if play {
+        let isPlaying = mediaPlayer.isPlaying()
+        if play && !isPlaying {
             mediaPlayer.play()
-        } else {
+        } else if !play && isPlaying {
             mediaPlayer.pause()
         }
-        controlView.setupPlayState(play: play)
+        delegate?.playerStateChange(play)
     }
     
     deinit {
@@ -143,22 +145,12 @@ public class RKVideoPlayer_VC: UIViewController {
 
 extension RKVideoPlayer_VC: RKVideoPlayerControlDelegate {
     internal func playerStateChange(_ play: Bool) {
-        let isPlaying = mediaPlayer.isPlaying()
-        if play && !isPlaying {
-            if reloading, let url = url {
-                mediaPlayer.reload(url)
-            } else {
-                mediaPlayer.play()
-            }
-        } else if !play && isPlaying {
-            mediaPlayer.pause()
-        }
-        delegate?.playerStateChange(play)
+        switchPlayState(play: play)
     }
     
     internal func seekProgress(_ progress: Float) {
         let time = mediaPlayer.duration * Double(progress)
-        mediaPlayer.seek(to: time, accurate: true)
+        seekVideoTime(second: time)
     }
     
     internal func playerQuit() {

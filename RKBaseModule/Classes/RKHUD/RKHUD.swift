@@ -107,7 +107,7 @@ public extension RKHUD {
         guard let withText = withText else { return }
         DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
             shared.animationType = .none
-            shared.setup(status: withText, hide: true, interaction: interaction, inView: inView)
+            shared.setup(status: withText, hide: true, interaction: interaction, delay: 2, inView: inView)
         }
     }
     
@@ -310,14 +310,10 @@ public class RKHUD: UIView {
 
         if (toolbarHUD == nil) {
             toolbarHUD = UIView()
-            toolbarHUD?.layer.shadowColor = UIColor(hex: 0x000000).withAlphaComponent(0.15).cgColor
-            toolbarHUD?.layer.shadowOffset = CGSize(width:0, height:5)
-            toolbarHUD?.layer.shadowRadius = 10
-            toolbarHUD?.layer.shadowOpacity = 1
             viewBackground?.addSubview(toolbarHUD!)
         }
 
-        toolbarHUD?.backgroundColor = colorHUD
+        toolbarHUD?.backgroundColor = .clear
     }
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
@@ -451,6 +447,7 @@ public class RKHUD: UIView {
             rectLabel.origin.y = 15
             labelStatus?.frame = rectLabel
             toolbarHUD?.bounds = CGRect(x: 0, y: 0, width: rectLabel.size.width + 30, height: rectLabel.size.height + 30)
+            setupShapeLayer()
             return
         }
         
@@ -484,7 +481,24 @@ public class RKHUD: UIView {
         viewAnimation?.center = CGPoint(x: centerX, y: centerY)
         viewAnimatedIcon?.center = CGPoint(x: centerX, y: centerY)
         staticImageView?.center = CGPoint(x: centerX, y: centerY)
+        setupShapeLayer()
     }
+    
+    private func setupShapeLayer() {
+        shapeLayer.frame = toolbarHUD!.bounds
+        shapeLayer.path = UIBezierPath(roundedRect: toolbarHUD!.bounds, byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 1, height: 1)).cgPath
+        toolbarHUD?.layer.insertSublayer(shapeLayer, at: 0)
+    }
+    
+    lazy var shapeLayer: CAShapeLayer = {
+        let maskLayer = CAShapeLayer()
+        maskLayer.fillColor = colorHUD.cgColor
+        maskLayer.shadowColor = UIColor(hex: 0x000000).withAlphaComponent(0.15).cgColor
+        maskLayer.shadowOffset = CGSize(width:0, height:5)
+        maskLayer.shadowRadius = 15
+        maskLayer.shadowOpacity = 1
+        return maskLayer
+    }()
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
     @objc private func setupPosition(_ notification: Notification? = nil) {
@@ -509,7 +523,7 @@ public class RKHUD: UIView {
 
         let mainWindow = hudInView ?? UIApplication.shared.keyWindow ?? UIApplication.shared.windows.first ?? UIWindow()
         let screen = mainWindow.bounds
-        let center = CGPoint(x: screen.size.width/2, y: (screen.size.height-heightKeyboard)/2-70)
+        let center = CGPoint(x: screen.size.width/2, y: (screen.size.height-heightKeyboard)/2-60)
 
         UIView.animate(withDuration: animationDuration, delay: 0, options: .allowUserInteraction, animations: {
             self.toolbarHUD?.center = center
@@ -551,10 +565,22 @@ public class RKHUD: UIView {
         if (self.alpha == 0) {
             self.alpha = 1
             toolbarHUD?.alpha = 0
-            toolbarHUD?.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-
-            UIView.animate(withDuration: 0.15, delay: 0, options: [.allowUserInteraction, .curveEaseIn], animations: {
-                self.toolbarHUD?.transform = CGAffineTransform(scaleX: 1/1.2, y: 1/1.2)
+            
+            let loading = labelStatus?.text == nil
+            let center = toolbarHUD?.center
+            let duration = loading ? 0.15 : 0.3
+            if loading {
+                toolbarHUD?.transform = CGAffineTransform(scaleX: 1.1, y: 1.1)
+            } else {
+                toolbarHUD?.center = CGPointMake(center!.x, center!.y + 20)
+            }
+            
+            UIView.animate(withDuration: duration, delay: 0, options: [.allowUserInteraction, .curveEaseIn], animations: {
+                if loading {
+                    self.toolbarHUD?.transform = CGAffineTransform(scaleX: 1/1.2, y: 1/1.2)
+                } else {
+                    self.toolbarHUD?.center = CGPointMake(center!.x, center!.y)
+                }
                 self.toolbarHUD?.alpha = 1
             }, completion: nil)
         }
@@ -563,8 +589,15 @@ public class RKHUD: UIView {
     //-------------------------------------------------------------------------------------------------------------------------------------------
     private func dismissHUD() {
         if (self.alpha == 1) {
-            UIView.animate(withDuration: 0.15, delay: 0, options: [.allowUserInteraction, .curveEaseIn], animations: {
-                self.toolbarHUD?.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
+            let loading = labelStatus?.text == nil
+            let center = toolbarHUD?.center
+            let duration = loading ? 0.15 : 0.3
+            UIView.animate(withDuration: duration, delay: 0, options: [.allowUserInteraction, .curveEaseIn], animations: {
+                if loading {
+                    self.toolbarHUD?.transform = CGAffineTransform(scaleX: 0.3, y: 0.3)
+                } else {
+                    self.toolbarHUD?.center = CGPointMake(center!.x, center!.y + 20)
+                }
                 self.toolbarHUD?.alpha = 0
             }, completion: { isFinished in
                 self.destroyHUD()

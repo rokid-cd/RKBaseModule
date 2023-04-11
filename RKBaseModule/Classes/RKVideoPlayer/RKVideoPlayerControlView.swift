@@ -158,6 +158,19 @@ class RKVideoPlayerControlView: UIView {
     
     @objc private func changeControlState(hidden: Bool = true) {
         guard !progressView.isDragSlider, playButton.isSelected else { return }
+        if !hidden { self.hiddenControlState(hidden) }
+        let alpha = CGFloat(hidden ? 0 : 1)
+        UIView.animate(withDuration: 0.25) {
+            self.quitButton.alpha = alpha
+            self.playButton.alpha = alpha
+            self.playCenterButton.alpha = alpha
+            self.stackView.alpha = alpha
+        } completion: { _ in
+            self.hiddenControlState(hidden)
+        }
+    }
+    
+    private func hiddenControlState(_ hidden: Bool) {
         quitButton.isHidden = hidden
         playButton.isHidden = hidden
         playCenterButton.isHidden = hidden
