@@ -205,6 +205,7 @@ class RKPreviewVideoCell: UIView, JXPhotoBrowserCell {
                 self?.videoModel?.size = fileSize
             }
         }
+        if !url.isFileURL, RKDownloadManager.isDownloading(fileUrl: url) { downloadVideo() }
     }
     
     private func initializeUIValue() {
@@ -384,30 +385,35 @@ extension RKPreviewVideoCell {
         if fileUrl.isFileURL {
             self.saveLoacalVideo(fileUrl)
         } else {
-            let sizeText = sizeLabel.text
-            RKDownloadManager.downLoadFile(fileUrl: fileUrl) { [weak self] progress in
-                let totalCount = progress.totalUnitCount
-                let completedCount = progress.completedUnitCount
-                guard let self = self, totalCount > 0 else { return }
-                self.sizeLabel.text = "\(Int(Double(completedCount)/Double(totalCount) * 100))%"
-                if completedCount >= totalCount {
-                    self.sizeLabel.text = "下载完成"
-                }
-            } completion: { [weak self] error, path in
-                guard let self = self else { return }
-                if let _ = error {
-                    RKPrompt.showToast(withText: "视频保存失败", inView: self)
-                    self.sizeLabel.text = sizeText
-                } else {
-                    self.saveLoacalVideo(URL(fileURLWithPath: path))
-                    self.sizeLabel.text = sizeText
-                }
+            guard !RKDownloadManager.isDownloading(fileUrl: fileUrl) else { return }
+            downloadVideo()
+        }
+    }
+    
+    private func downloadVideo() {
+        guard let fileUrl = videoModel?.fileUrl else { return }
+        let sizeText = sizeLabel.text
+        RKDownloadManager.downLoadFile(fileUrl: fileUrl) { [weak self] progress in
+            let totalCount = progress.totalUnitCount
+            let completedCount = progress.completedUnitCount
+            guard let self = self, totalCount > 0 else { return }
+            self.sizeLabel.text = "\(Int(Double(completedCount)/Double(totalCount) * 100))%"
+            if completedCount >= totalCount {
+                self.sizeLabel.text = "下载完成"
+            }
+        } completion: { [weak self] error, path in
+            guard let self = self else { return }
+            if let _ = error {
+                RKPrompt.showToast(withText: "视频保存失败", inView: self)
+                self.sizeLabel.text = sizeText
+            } else {
+                self.saveLoacalVideo(URL(fileURLWithPath: path))
+                self.sizeLabel.text = sizeText
             }
         }
     }
     
     private func saveLoacalVideo(_ fileUrl: URL) {
-        
         PHPhotoLibrary.shared().performChanges {
             PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: fileUrl)
         } completionHandler: { success, error in
@@ -645,7 +651,7 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
             UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
             return
         }
-        guard let fileUrl = imageModel?.fileUrl else { return }
+        guard let fileUrl = imageModel?.fileUrl, !RKDownloadManager.isDownloading(fileUrl: fileUrl) else { return }
         let sizeText = sizeLabel.text
         RKDownloadManager.downLoadFile(fileUrl: fileUrl) { [weak self] progress in
             let totalCount = progress.totalUnitCount
