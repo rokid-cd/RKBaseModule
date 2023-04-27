@@ -7,9 +7,9 @@
 
 import UIKit
 
-protocol RKVideoPlayerControlDelegate: NSObjectProtocol {
+public protocol RKVideoPlayerControlDelegate: NSObjectProtocol {
     func playerStateChange(_ play: Bool)
-    func seekProgress(_ progress: Float)
+    func playerSeekProgress(_ progress: Float)
     func playerQuit()
 }
 
@@ -86,7 +86,7 @@ class RKVideoPlayerControlView: UIView {
         progressView.dragingSliderClosure = {[weak self] progress in
             guard let self = self else { return }
             self.timerShowControl()
-            self.delegate?.seekProgress(progress)
+            self.delegate?.playerSeekProgress(progress)
         }
         stackView.addArrangedSubview(progressView)
         

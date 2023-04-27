@@ -34,8 +34,8 @@ public class RKProgressView: UIView {
     public var dragingSliderClosure: ((Float)->Void)?
     public var totalTimeSeconds: Float = 0 {
         didSet {
-            playedTimeLabel.attributedText = formatTime(time: playProgress * totalTimeSeconds)
-            totalTimeLabel.attributedText = formatTime(time: totalTimeSeconds)
+            updateTime(lab: playedTimeLabel, time: playProgress * totalTimeSeconds)
+            updateTime(lab: totalTimeLabel, time: totalTimeSeconds)
             playedTimeLabel.snp.updateConstraints { make in
                 make.width.equalTo((totalTimeSeconds > 60 * 60) ? 72 : 46)
             }
@@ -50,10 +50,23 @@ public class RKProgressView: UIView {
     public var playProgress: Float = 0 {
         didSet {
             slider.setValue(playProgress, animated: true)
-            playedTimeLabel.attributedText = formatTime(time: playProgress * totalTimeSeconds)
+            updateTime(lab: playedTimeLabel, time: playProgress * totalTimeSeconds)
+        }
+    }
+    public var timeShadow: Bool = true
+    
+    public var timeColor: UIColor? {
+        didSet {
+            playedTimeLabel.textColor = timeColor
+            totalTimeLabel.textColor = timeColor
         }
     }
     
+    public var trackTintColor: UIColor? {
+        didSet {
+            slider.maximumTrackTintColor = trackTintColor ?? .clear
+        }
+    }
     
     private var slider: ARIMSlider!
     
@@ -127,7 +140,16 @@ public class RKProgressView: UIView {
         }
     }
     
-    private func formatTime(time: Float) -> NSMutableAttributedString {
+    private func updateTime(lab: UILabel, time: Float) {
+        let timeText = formatTime(time: time)
+        if timeShadow {
+            lab.attributedText = attributedFormatTime(text: timeText)
+        } else {
+            lab.text = timeText
+        }
+    }
+    
+    private func formatTime(time: Float) -> String {
         let timeH = Int(ceil(time)) / (60 * 60)
         let timeS = Int(ceil(time)) % 60
         var text = ""
@@ -138,6 +160,11 @@ public class RKProgressView: UIView {
             let timeM = Int(ceil(time)) / 60
             text = String(format:"%0.2d:%0.2d", timeM, timeS)
         }
+        return text
+    }
+    
+    private func attributedFormatTime(text: String) -> NSMutableAttributedString {
+        
         let att = NSMutableAttributedString(string: text)
         let shadow = NSShadow()
         shadow.shadowBlurRadius = 2.0
@@ -153,7 +180,7 @@ public class RKProgressView: UIView {
     
     @objc private func sliderChangeAction() {
         guard totalTimeSeconds > 0 else { return }
-        playedTimeLabel.attributedText = formatTime(time: totalTimeSeconds * slider.value)
+        updateTime(lab: playedTimeLabel, time: totalTimeSeconds * slider.value)
     }
     
     @objc private func sliderDidEndAction() {
