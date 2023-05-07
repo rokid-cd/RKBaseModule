@@ -25,6 +25,8 @@ public class RKMediaPlayer: NSObject {
         return player
     }()
     
+    public var shouldHideVideo = false
+    
     public var mediaPlayerClosure: ((RKMediaPlayerState) -> Void)?
     
     public override init() {
@@ -66,8 +68,10 @@ public class RKMediaPlayer: NSObject {
         }
         if NSNotification.Name.MPMoviePlayerFirstAudioFrameRendered == notify.name {
             // 解决有的视频卡帧以及渲染失败bug
-            player.shouldHideVideo = false
-            player.seek(to: 0, accurate: true)
+            if !shouldHideVideo {
+                player.shouldHideVideo = false
+                player.seek(to: 0, accurate: true)
+            }
         }
     }
     
