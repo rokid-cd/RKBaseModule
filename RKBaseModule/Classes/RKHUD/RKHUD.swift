@@ -14,6 +14,7 @@ public enum AnimationType {
     case systemActivityIndicator
     case horizontalCirclesPulse
     case lineScaling
+    case lineBlueScaling
     case singleCirclePulse
     case multipleCirclePulse
     case singleCircleScaleRipple
@@ -30,6 +31,11 @@ public enum AnimatedIcon {
     case succeed
     case failed
     case added
+}
+
+public enum HudType {
+    case Loading
+    case Toast
 }
 
 // MARK: -
@@ -105,6 +111,7 @@ public extension RKHUD {
     //-------------------------------------------------------------------------------------------------------------------------------------------
     class func showToast(withText: String?, interaction: Bool = true, inView: UIView? = nil) {
         guard let withText = withText else { return }
+        shared.hudType = .Toast
         DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
             shared.animationType = .none
             shared.setup(status: withText, hide: true, interaction: interaction, delay: 2, inView: inView)
@@ -113,7 +120,7 @@ public extension RKHUD {
     
     
     class func show(_ status: String? = nil, interaction: Bool = true, inView: UIView? = nil) {
-        
+        shared.hudType = .Loading
         shared.resetType()
         shared.setup(status: status, hide: false, interaction: interaction, inView: inView)
     }
@@ -202,9 +209,11 @@ public class RKHUD: UIView {
     private var timer: Timer?
 
     private var animationType    = AnimationType.none
+    private var hudType = HudType.Loading
 
     private var colorBackground    = UIColor(red: 0, green: 0, blue: 0, alpha: 0.2)
     private var colorHUD           = UIColor.systemGray
+    private var colorLoading       = UIColor.white
     private var colorStatus        = UIColor.white
     private var colorAnimation     = UIColor.white
     private var colorProgress      = UIColor.white
@@ -276,7 +285,7 @@ public class RKHUD: UIView {
     
     private func resetType() {
         if animationType == .none {
-            animationType = .systemActivityIndicator
+            animationType = .lineBlueScaling
         }
     }
     
@@ -381,6 +390,7 @@ public class RKHUD: UIView {
         if (animationType == .systemActivityIndicator)        { animationSystemActivityIndicator(viewAnimation!)        }
         if (animationType == .horizontalCirclesPulse)        { animationHorizontalCirclesPulse(viewAnimation!)        }
         if (animationType == .lineScaling)                    { animationLineScaling(viewAnimation!)                    }
+        if (animationType == .lineBlueScaling)                    { animationLineBlueScaling(viewAnimation!)                    }
         if (animationType == .singleCirclePulse)            { animationSingleCirclePulse(viewAnimation!)            }
         if (animationType == .multipleCirclePulse)            { animationMultipleCirclePulse(viewAnimation!)            }
         if (animationType == .singleCircleScaleRipple)        { animationSingleCircleScaleRipple(viewAnimation!)        }
@@ -486,13 +496,14 @@ public class RKHUD: UIView {
     
     private func setupShapeLayer() {
         shapeLayer.frame = toolbarHUD!.bounds
+        shapeLayer.fillColor = hudType == .Loading ? UIColor.clear.cgColor : colorHUD.cgColor
         shapeLayer.path = UIBezierPath(roundedRect: toolbarHUD!.bounds, byRoundingCorners: .allCorners, cornerRadii: CGSize(width: 1, height: 1)).cgPath
         toolbarHUD?.layer.insertSublayer(shapeLayer, at: 0)
     }
     
     lazy var shapeLayer: CAShapeLayer = {
         let maskLayer = CAShapeLayer()
-        maskLayer.fillColor = colorHUD.cgColor
+//        maskLayer.fillColor = colorHUD.cgColor
         maskLayer.shadowColor = UIColor(hex: 0x000000).withAlphaComponent(0.15).cgColor
         maskLayer.shadowOffset = CGSize(width:0, height:5)
         maskLayer.shadowRadius = 15
@@ -620,7 +631,6 @@ public class RKHUD: UIView {
     private func destroyHUD() {
 
         NotificationCenter.default.removeObserver(self)
-
         staticImageView?.removeFromSuperview();        staticImageView = nil
         viewAnimatedIcon?.removeFromSuperview();    viewAnimatedIcon = nil
         viewAnimation?.removeFromSuperview();        viewAnimation = nil
@@ -687,7 +697,7 @@ public class RKHUD: UIView {
 
     //-------------------------------------------------------------------------------------------------------------------------------------------
     private func animationLineScaling(_ view: UIView) {
-
+        
         let width = view.frame.size.width
         let height = view.frame.size.height
 
@@ -721,6 +731,39 @@ public class RKHUD: UIView {
         }
     }
 
+    private func animationLineBlueScaling(_ view: UIView) {
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 10
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOpacity = 0.15
+        view.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
+        view.layer.shadowRadius = 4
+        
+        let animation = CABasicAnimation.init(keyPath: "transform.scale.y")
+        animation.toValue = 0.1
+        animation.duration = 0.4
+        animation.autoreverses = true
+        animation.repeatCount = MAXFLOAT
+
+        let lineLayer = CALayer()
+        lineLayer.frame = CGRect(x: 12, y: 20, width: 6, height: 20)
+        lineLayer.backgroundColor = UIColor.white.cgColor
+        lineLayer.cornerRadius = 0
+        lineLayer.masksToBounds = true
+        lineLayer.anchorPoint = CGPoint.init(x: 0, y: 0.5)
+
+        let replicatorLayer = CAReplicatorLayer.init()
+        replicatorLayer.instanceCount = 3
+        replicatorLayer.instanceTransform = CATransform3DMakeTranslation(10, 0, 0)
+        replicatorLayer.instanceDelay = 0.2
+        replicatorLayer.instanceColor = UIColor(hex: 0x194BFB).cgColor
+        replicatorLayer.addSublayer(lineLayer)
+        
+        view.layer.addSublayer(replicatorLayer)
+        lineLayer.add(animation, forKey: "scaleAnimation")
+
+    }
+    
     //-------------------------------------------------------------------------------------------------------------------------------------------
     private func animationSingleCirclePulse(_ view: UIView) {
 
