@@ -733,7 +733,7 @@ public class RKHUD: UIView {
 
     private func animationLineBlueScaling(_ view: UIView) {
         view.backgroundColor = .white
-        view.layer.cornerRadius = 10
+        view.layer.cornerRadius = 5
         view.layer.shadowColor = UIColor.black.cgColor
         view.layer.shadowOpacity = 0.15
         view.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
