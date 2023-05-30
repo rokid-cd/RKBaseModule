@@ -647,8 +647,9 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
     //保存到相册
     @objc func downloadAction() {
         
-        if let image = imageView.image {
-            UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
+        if let _ = imageView.image, let fileUrl = imageModel?.fileUrl {
+            self.saveImage(fileUrl)
+//            UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
             return
         }
         guard let fileUrl = imageModel?.fileUrl, !RKDownloadManager.isDownloading(fileUrl: fileUrl) else { return }
@@ -663,13 +664,34 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
             }
         } completion: { [weak self] error, path in
             guard let self = self else { return }
-            if error == nil, let image = UIImage(contentsOfFile: path) {
-                UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
+            if error == nil {
+                self.saveImage(URL(fileURLWithPath: path))
+//                UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
                 
             } else {
                 RKPrompt.showToast(withText: "图片保存失败", inView: self)
             }
             self.sizeLabel.text = sizeText
+        }
+    }
+    
+    private func saveImage(_ fileUrl: URL) {
+        DispatchQueue.global().async {
+            if let data = try? Data(contentsOf: fileUrl) {
+                PHPhotoLibrary.shared().performChanges {
+                    let options = PHAssetResourceCreationOptions()
+                    PHAssetCreationRequest.forAsset().addResource(with: .photo, data: data, options: options)
+                } completionHandler: { (isSuccess: Bool, error: Error?) in
+                    DispatchQueue.main.async {
+                        RKPrompt.hidenLoading(inView: self)
+                        if isSuccess {
+                            RKPrompt.showToast(withText: "保存成功", inView: self)
+                        } else {
+                            RKPrompt.showToast(withText: "保存失败", inView: self)
+                        }
+                    }
+                }
+            }
         }
     }
     
