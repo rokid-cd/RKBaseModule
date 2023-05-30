@@ -530,12 +530,29 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
     
     //保存到相册
     @objc func downloadAction() {
-        guard let image = imageView.image else {
+        guard let fileUrl = imageModel?.fileUrl else {
             RKPrompt.showToast(withText: "保存失败", inView: self)
             return
         }
         RKPrompt.showLoading(inView: self)
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
+//        UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.savedPhotosAlbum(image:didFinishSavingWithError:contextInfo:)), nil)
+        DispatchQueue.global().async {
+            if let data = try? Data(contentsOf: fileUrl) {
+                PHPhotoLibrary.shared().performChanges {
+                    let options = PHAssetResourceCreationOptions()
+                    PHAssetCreationRequest.forAsset().addResource(with: .photo, data: data, options: options)
+                } completionHandler: { (isSuccess: Bool, error: Error?) in
+                    DispatchQueue.main.async {
+                        RKPrompt.hidenLoading(inView: self)
+                        if isSuccess {
+                            RKPrompt.showToast(withText: "保存失败", inView: self)
+                        } else {
+                            RKPrompt.showToast(withText: "保存成功", inView: self)
+                        }
+                    }
+                }
+            }
+        }
     }
     
     @objc func savedPhotosAlbum(image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: AnyObject) {
