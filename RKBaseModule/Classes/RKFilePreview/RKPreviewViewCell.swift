@@ -545,9 +545,9 @@ class RKPreviewImageCell: JXPhotoBrowserImageCell {
                     DispatchQueue.main.async {
                         RKPrompt.hidenLoading(inView: self)
                         if isSuccess {
-                            RKPrompt.showToast(withText: "保存失败", inView: self)
-                        } else {
                             RKPrompt.showToast(withText: "保存成功", inView: self)
+                        } else {
+                            RKPrompt.showToast(withText: "保存失败", inView: self)
                         }
                     }
                 }
